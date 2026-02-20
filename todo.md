@@ -1,4 +1,4 @@
-# 🎲 Turd Gambling Network — Discord Betting Bot
+# 🎰 Turd Casino — Discord Betting Bot
 ## Master Build Document — Cline AI Implementation Guide
 
 > **PRIME DIRECTIVE**: Zero placeholders. Zero mock data. Zero stub functions. Zero TODO/FIXME comments in code. Every feature listed must be fully functional before marking it complete. If a feature cannot be built, remove it entirely — do not scaffold it.
@@ -51,7 +51,7 @@
 
 ---
 
-## 🎯 PHASE 1 — Peer Bet System (START HERE)
+## 🎯 PHASE 1 — Custom Bet System (START HERE)
 
 The foundation: users create bets against each other (1v1, 1vMany, ManyvMany).
 

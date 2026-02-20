@@ -19,21 +19,21 @@ class DashboardView(ui.View):
         self.dashboard_builder = dashboard_builder
         
         # Add buttons
-        self.add_item(CreateBetButton())
+        self.add_item(CustomBetsButton())
         self.add_item(JoinBetButton())
         self.add_item(MyBetsButton())
         self.add_item(LeaderboardButton())
         self.add_item(DailyBonusButton())
 
 
-class CreateBetButton(ui.Button):
-    """Button to create a new bet"""
+class CustomBetsButton(ui.Button):
+    """Button to create custom bets"""
     
     def __init__(self):
         super().__init__(
-            label="🎲 Create Bet",
+            label="🎲 Custom Bets",
             style=discord.ButtonStyle.primary,
-            custom_id="dashboard_create_bet"
+            custom_id="dashboard_custom_bets"
         )
     
     async def callback(self, interaction: discord.Interaction):

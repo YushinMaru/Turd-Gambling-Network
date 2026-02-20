@@ -23,7 +23,7 @@ class DashboardBuilder:
     def build_dashboard(self, guild: discord.Guild) -> discord.Embed:
         """Build the main dashboard embed"""
         embed = discord.Embed(
-            title="🎲 Turd Gambling Network",
+            title="🎰 Turd Casino",
             description="Welcome to the premier betting experience!",
             color=EMBED_COLOR,
             timestamp=datetime.now()
@@ -59,7 +59,7 @@ class DashboardBuilder:
                 embed.add_field(name="🎯 Open Bets", value="\n".join(bets_text), inline=False)
         
         # Footer with instructions
-        embed.set_footer(text="Use the buttons below to interact • Turd Gambling Network")
+        embed.set_footer(text="Use the buttons below to interact • Turd Casino")
         
         return embed
     

@@ -44,8 +44,8 @@ logger = setup_logging()
 
 
 # ============== BOT CLASS ==============
-class TurdGamblingBot(commands.Bot):
-    """Main bot class for Turd Gambling Network"""
+class TurdCasinoBot(commands.Bot):
+    """Main bot class for Turd Casino"""
     
     def __init__(self):
         intents = discord.Intents.default()
@@ -161,9 +161,9 @@ class TurdGamblingBot(commands.Bot):
 async def run_bot():
     """Run the bot"""
     print("=" * 50)
-    print("🎲 TURD GAMBLING NETWORK")
+    print("🎰 TURD CASINO")
     print("=" * 50)
-    print("Peer Betting System - Dashboard Only")
+    print("Custom Bets - Dashboard Only")
     print("=" * 50)
     
     if not DISCORD_BOT_TOKEN:
@@ -179,7 +179,7 @@ async def run_bot():
     logger.info("Database initialized")
     
     # Run bot
-    bot = TurdGamblingBot()
+    bot = TurdCasinoBot()
     
     try:
         await bot.start(DISCORD_BOT_TOKEN)
