@@ -5,18 +5,20 @@ Dashboard Views - Button handlers and interactions
 import discord
 from discord import ui
 from config import DAILY_BONUS_AMOUNT, MIN_BET_AMOUNT, MAX_BET_AMOUNT
+from bet_threads import post_bet_to_channel
 
 
 class DashboardView(ui.View):
     """Main dashboard buttons"""
     
-    def __init__(self, bot, db, currency, bet_manager, dashboard_builder):
+    def __init__(self, bot, db, currency, bet_manager, dashboard_builder, channel_manager):
         super().__init__(timeout=None, persistent=True)
         self.bot = bot
         self.db = db
         self.currency = currency
         self.bet_manager = bet_manager
         self.dashboard_builder = dashboard_builder
+        self.channel_manager = channel_manager
         
         # Add buttons
         self.add_item(CustomBetsButton())
@@ -225,6 +227,17 @@ class CreateBetModal(ui.Modal):
         success, message, bet_id = self.view.bet_manager.create_bet(user_id, topic, amount, description)
         
         if success:
+            # Post bet to #turd-bets channel
+            bot = self.view.bot
+            try:
+                await post_bet_to_channel(
+                    bet_id, topic, amount, display_name,
+                    self.view.channel_manager, bot
+                )
+            except Exception as e:
+                # Log but don't fail
+                pass
+            
             embed = discord.Embed(
                 title="✅ Bet Created!",
                 description=message,
@@ -295,8 +308,8 @@ class JoinBetModal(ui.Modal):
 DASHBOARD_VIEW = None
 
 
-def setup_dashboard_view(bot, db, currency, bet_manager, dashboard_builder):
+def setup_dashboard_view(bot, db, currency, bet_manager, dashboard_builder, channel_manager):
     """Set up and return the dashboard view"""
     global DASHBOARD_VIEW
-    DASHBOARD_VIEW = DashboardView(bot, db, currency, bet_manager, dashboard_builder)
+    DASHBOARD_VIEW = DashboardView(bot, db, currency, bet_manager, dashboard_builder, channel_manager)
     return DASHBOARD_VIEW

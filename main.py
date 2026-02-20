@@ -81,7 +81,7 @@ class TurdCasinoBot(commands.Bot):
         
         # Set up dashboard view
         self.dashboard_view = setup_dashboard_view(
-            self, self.db, self.currency, self.bet_manager, self.dashboard_builder
+            self, self.db, self.currency, self.bet_manager, self.dashboard_builder, self.channel_manager
         )
         
         # Register persistent view
@@ -175,9 +175,6 @@ async def run_bot():
     if not DISCORD_BOT_TOKEN:
         logger.error("No Discord bot token found! Set DISCORD_BOT_TOKEN in .env")
         return
-    
-    if DASHBOARD_CHANNEL_ID == 0:
-        logger.warning("No dashboard channel ID set. Set DASHBOARD_CHANNEL_ID in .env")
     
     # Initialize database
     initializer = DatabaseInitializer(DB_PATH)
