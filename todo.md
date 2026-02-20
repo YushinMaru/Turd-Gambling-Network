@@ -46,13 +46,13 @@
 - [x] Create `channels.py` - Channel setup and management
 - [x] Add channel names to `config.py`
 - [x] Update `main.py` - call channel setup on startup
-- [ ] Update dashboard - post to #Turd-Gambling (done via channel manager)
-- [ ] Update bet flow - create thread in #Turd-Bets
-- [ ] Add Win/Lose/Dispute buttons to bet threads
-- [ ] Update resolution - archive to #Turd-Archive, dispute to #Turd-Admin
+- [x] Update dashboard - post to #Turd-Gambling
+- [x] Update bet flow - create thread in #Turd-Bets
+- [x] Add Win/Lose/Dispute buttons to bet threads
+- [x] Update resolution - archive to #Turd-Archive, dispute to #Turd-Admin
 - [ ] Test and verify
 
-> **CHECKPOINT**: Channels created and working.
+> **CHECKPOINT**: All channel & bet flow features implemented!
 
 ## ✅ PHASE 0 — Pre-Work (Complete)
 
