@@ -1,0 +1,116 @@
+"""
+Database initialization and schema for Turd Gambling Network
+"""
+
+import sqlite3
+import logging
+from config import DB_PATH
+
+logger = logging.getLogger(__name__)
+
+
+class DatabaseInitializer:
+    """Handles database schema initialization"""
+    
+    def __init__(self, db_path: str = DB_PATH):
+        self.db_path = db_path
+    
+    def init_database(self):
+        """Initialize all database tables"""
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        # Create users table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                user_id TEXT PRIMARY KEY,
+                username TEXT NOT NULL,
+                display_name TEXT,
+                balance INTEGER DEFAULT 1000,
+                total_won INTEGER DEFAULT 0,
+                total_lost INTEGER DEFAULT 0,
+                bets_won INTEGER DEFAULT 0,
+                bets_lost INTEGER DEFAULT 0,
+                daily_bonus_claimed TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                last_active TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Create bets table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS bets (
+                bet_id TEXT PRIMARY KEY,
+                creator_id TEXT NOT NULL,
+                bet_topic TEXT NOT NULL,
+                bet_description TEXT,
+                amount INTEGER NOT NULL,
+                bet_type TEXT DEFAULT 'peer',
+                status TEXT DEFAULT 'open',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                resolved_at TEXT,
+                winner_id TEXT,
+                FOREIGN KEY (creator_id) REFERENCES users(user_id)
+            )
+        ''')
+        
+        # Create bet_participants table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS bet_participants (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                bet_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                side TEXT NOT NULL,
+                joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (bet_id) REFERENCES bets(bet_id),
+                FOREIGN KEY (user_id) REFERENCES users(user_id),
+                UNIQUE(bet_id, user_id)
+            )
+        ''')
+        
+        # Create transactions table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS transactions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL,
+                amount INTEGER NOT NULL,
+                transaction_type TEXT NOT NULL,
+                bet_id TEXT,
+                description TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(user_id)
+            )
+        ''')
+        
+        # Create daily_bonus_log table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS daily_bonus_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT NOT NULL,
+                amount INTEGER NOT NULL,
+                claimed_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(user_id)
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
+        logger.info("Database initialized successfully")
+    
+    def get_connection(self) -> sqlite3.Connection:
+        """Get database connection with proper settings"""
+        conn = sqlite3.connect(self.db_path, timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        return conn
+
+
+def init_db():
+    """Initialize the database"""
+    initializer = DatabaseInitializer()
+    initializer.init_database()
+
+
+if __name__ == "__main__":
+    init_db()
+    print("Database initialized!")

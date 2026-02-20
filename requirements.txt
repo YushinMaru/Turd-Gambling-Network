@@ -1,0 +1,2 @@
+# Turd Gambling Network Dependencies
+discord.py>=2.6.0
