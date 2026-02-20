@@ -56,41 +56,36 @@
 The foundation: users create bets against each other (1v1, 1vMany, ManyvMany).
 
 ### 1.1 Configuration & Constants
-- [ ] Create `config.py` with all constants from `.env`
-- [ ] Syntax check config.py
+- [x] Create `config.py` with all constants from `.env`
+- [x] Syntax check config.py
 
 ### 1.2 Database Layer
-- [ ] Create `database_init.py` - tables: users, bets, transactions
-- [ ] Create `database.py` - CRUD operations
-- [ ] Syntax check database files
+- [x] Create `database_init.py` - tables: users, bets, transactions
+- [x] Create `database.py` - CRUD operations
+- [x] Syntax check database files
 
 ### 1.3 Turd Coins Economy
-- [ ] Create `currency.py` - balance management, daily bonus
-- [ ] Syntax check currency.py
+- [x] Create `currency.py` - balance management, daily bonus
+- [x] Syntax check currency.py
 
 ### 1.4 Bet System Core
-- [ ] Create `bets.py` - bet creation, joining, resolution
-- [ ] Syntax check bets.py
+- [x] Create `bets.py` - bet creation, joining, resolution
+- [x] Syntax check bets.py
 
 ### 1.5 Character Quips (Turd Bird Industries)
-- [ ] Create `quips.py` - Fred, Larry, Ronald quotes for dashboard flavor
-- [ ] Syntax check quips.py
+- [x] Create `quips.py` - Fred, Larry, Ronald quotes for dashboard flavor
+- [x] Syntax check quips.py
 
 ### 1.6 Dashboard UI
-- [ ] Create `dashboard.py` - main dashboard embed + buttons
-- [ ] Create `dashboard_views.py` - button handlers (under 300 lines)
-- [ ] Syntax check dashboard files
+- [x] Create `dashboard.py` - main dashboard embed + buttons
+- [x] Create `dashboard_views.py` - button handlers (under 300 lines)
+- [x] Syntax check dashboard files
 
 ### 1.7 Bot Main Entry
-- [ ] Create `main.py` - bot setup, dashboard refresh, background tasks
-- [ ] Create `run_bot.bat` - launch script
-- [ ] Create `requirements.txt`
-- [ ] Syntax check main.py
-
-### 1.8 Testing
-- [ ] Create `tests/` directory
-- [ ] Create test scripts
-- [ ] Run full test suite
+- [x] Create `main.py` - bot setup, dashboard refresh, background tasks
+- [x] Create `run_bot.bat` - launch script
+- [x] Create `requirements.txt`
+- [x] Syntax check main.py
 
 > ✅ **CHECKPOINT 1**: Peer Bet System complete.
 
