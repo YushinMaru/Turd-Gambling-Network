@@ -41,6 +41,19 @@
 
 ---
 
+## 🎯 CHANNEL SETUP (Next Task)
+
+- [ ] Create `channels.py` - Channel setup and management
+- [ ] Add channel names to `config.py`
+- [ ] Update `main.py` - call channel setup on startup
+- [ ] Update dashboard - post to #Turd-Gambling
+- [ ] Update bet flow - create thread in #Turd-Bets
+- [ ] Add Win/Lose/Dispute buttons to bet threads
+- [ ] Update resolution - archive to #Turd-Archive, dispute to #Turd-Admin
+- [ ] Test and verify
+
+> **CHECKPOINT**: Channels created and working.
+
 ## ✅ PHASE 0 — Pre-Work (Complete)
 
 - [x] **0.1** Discord bot token obtained from Turd-News-Network
