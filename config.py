@@ -19,10 +19,17 @@ if env_file.exists():
 # ============== REQUIRED ENVIRONMENT VARIABLES ==============
 DISCORD_BOT_TOKEN = os.environ.get('DISCORD_BOT_TOKEN', '')
 
-# Channel IDs
-DASHBOARD_CHANNEL_ID = int(os.environ.get('DASHBOARD_CHANNEL_ID', '0')) if os.environ.get('DASHBOARD_CHANNEL_ID', '0').isdigit() else 0
-ANNOUNCEMENTS_CHANNEL_ID = int(os.environ.get('ANNOUNCEMENTS_CHANNEL_ID', '0')) if os.environ.get('ANNOUNCEMENTS_CHANNEL_ID', '0').isdigit() else 0
-BET_THREADS_CHANNEL_ID = int(os.environ.get('BET_THREADS_CHANNEL_ID', '0')) if os.environ.get('BET_THREADS_CHANNEL_ID', '0').isdigit() else 0
+# Channel Names (for auto-creation)
+CATEGORY_NAME = "Turd Casino"
+CHANNEL_GAMBLING = "turd-gambling"
+CHANNEL_BETS = "turd-bets"
+CHANNEL_ADMIN = "turd-admin"
+CHANNEL_ARCHIVE = "turd-archive"
+
+# Channel IDs (deprecated - using channel names now)
+DASHBOARD_CHANNEL_ID = 0  # Now uses CHANNEL_GAMBLING
+ANNOUNCEMENTS_CHANNEL_ID = 0  # Now uses CHANNEL_ADMIN
+BET_THREADS_CHANNEL_ID = 0  # Now uses CHANNEL_BETS
 
 # Turd Coins Configuration
 STARTING_BALANCE = int(os.environ.get('STARTING_BALANCE', '1000'))

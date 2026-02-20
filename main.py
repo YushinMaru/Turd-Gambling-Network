@@ -15,7 +15,7 @@ from discord.ext import commands, tasks
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from config import (
-    DISCORD_BOT_TOKEN, DASHBOARD_CHANNEL_ID, DB_PATH,
+    DISCORD_BOT_TOKEN, DB_PATH,
     LOG_FILE, LOG_MAX_BYTES, EMBED_COLOR
 )
 from database import DatabaseManager
@@ -24,6 +24,7 @@ from currency import CurrencyManager
 from bets import BetManager
 from dashboard import DashboardBuilder
 from dashboard_views import setup_dashboard_view
+from channels import ChannelManager
 
 
 # ============== LOGGING SETUP ==============
@@ -65,6 +66,9 @@ class TurdCasinoBot(commands.Bot):
         self.bet_manager = BetManager(self.db, self.currency)
         self.dashboard_builder = DashboardBuilder(self.db, self.currency, self.bet_manager)
         
+        # Channel manager
+        self.channel_manager = ChannelManager(self)
+        
         # Dashboard view will be set up in setup_hook
         self.dashboard_view = None
         self.dashboard_message = None
@@ -90,23 +94,25 @@ class TurdCasinoBot(commands.Bot):
     
     async def on_ready(self):
         """Bot ready"""
-        logger.info(f"[BOT] Turd Gambling Network is ready: {self.user}")
+        logger.info(f"[BOT] Turd Casino is ready: {self.user}")
         logger.info(f"[BOT] Bot ID: {self.user.id}")
+        
+        # Set up channels for the first guild
+        if self.guilds:
+            guild = self.guilds[0]
+            await self.channel_manager.setup_channels(guild)
         
         # Post initial dashboard
         await self.post_dashboard()
     
     async def post_dashboard(self):
-        """Post the dashboard to the dashboard channel"""
-        if DASHBOARD_CHANNEL_ID == 0:
-            logger.warning("[DASHBOARD] No dashboard channel ID configured!")
-            return
-        
+        """Post the dashboard to the gambling channel"""
         try:
-            channel = self.get_channel(DASHBOARD_CHANNEL_ID)
+            # Use the gambling channel from channel manager
+            channel = self.channel_manager.get_gambling_channel()
             
             if not channel:
-                logger.error(f"[DASHBOARD] Could not find channel {DASHBOARD_CHANNEL_ID}")
+                logger.warning("[DASHBOARD] Gambling channel not set up yet!")
                 return
             
             # Purge all messages in the channel
