@@ -97,13 +97,22 @@ class TurdCasinoBot(commands.Bot):
         logger.info(f"[BOT] Turd Casino is ready: {self.user}")
         logger.info(f"[BOT] Bot ID: {self.user.id}")
         
-        # Set up channels for the first guild
-        if self.guilds:
-            guild = self.guilds[0]
+        # Set up channels for ALL guilds the bot is in
+        for guild in self.guilds:
+            logger.info(f"[BOT] Setting up channels for server: {guild.name}")
             await self.channel_manager.setup_channels(guild)
         
         # Post initial dashboard
         await self.post_dashboard()
+    
+    async def on_guild_join(self, guild: discord.Guild):
+        """Called when the bot joins a new server"""
+        logger.info(f"[BOT] Joined new server: {guild.name} (ID: {guild.id})")
+        
+        # Set up channels for the new server
+        await self.channel_manager.setup_channels(guild)
+        
+        logger.info(f"[BOT] Channels set up for {guild.name}")
     
     async def post_dashboard(self):
         """Post the dashboard to the gambling channel"""
