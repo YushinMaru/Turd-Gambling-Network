@@ -129,15 +129,62 @@ class DatabaseManager:
     
     # ============== BET OPERATIONS ==============
     
+    def create_bet_advanced(self, bet_id: str, creator_id: str, bet_topic: str, amount: int, 
+                           bet_description: str = None, bet_type: str = '1v1', category: str = 'Random',
+                           odds: str = 'even', visibility: str = 'open', expiration: str = '7d',
+                           verification_type: str = 'manual') -> bool:
+        """Create a new bet with all advanced options"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        try:
+            c.execute('''INSERT INTO bets (bet_id, creator_id, bet_topic, bet_description, amount,
+                        bet_type, category, odds, visibility, expiration, verification_type)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                     (bet_id, creator_id, bet_topic, bet_description, amount,
+                      bet_type, category, odds, visibility, expiration, verification_type))
+            
+            # Add creator as participant (side A)
+            c.execute('''INSERT INTO bet_participants (bet_id, user_id, side)
+                        VALUES (?, ?, 'A')''', (bet_id, creator_id))
+            
+            # Deduct from creator's balance
+            c.execute("UPDATE users SET balance = balance - ? WHERE user_id = ?", (amount, creator_id))
+            
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error creating advanced bet: {e}")
+            conn.rollback()
+            conn.close()
+            return False
+    
+    def add_bet_participant(self, bet_id: str, user_id: str, side: str = 'B') -> bool:
+        """Add a participant to a bet"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        try:
+            c.execute('''INSERT INTO bet_participants (bet_id, user_id, side)
+                        VALUES (?, ?, ?)''', (bet_id, user_id, side))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error adding participant: {e}")
+            conn.close()
+            return False
+    
     def create_bet(self, bet_id: str, creator_id: str, bet_topic: str, amount: int, bet_description: str = None) -> bool:
         """Create a new bet"""
         conn = self.get_connection()
         c = conn.cursor()
         
         try:
-            c.execute('''INSERT INTO bets (bet_id, creator_id, bet_topic, bet_description, amount)
-                        VALUES (?, ?, ?, ?, ?)''',
-                     (bet_id, creator_id, bet_topic, bet_description, amount))
+            c.execute('''INSERT INTO bets (bet_id, creator_id, bet_topic, bet_description, amount, status, bet_type, category, odds, visibility, expiration, verification_type)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                     (bet_id, creator_id, bet_topic, bet_description, amount, 'open', '1v1', 'Random', 'even', 'open', '7d', 'manual'))
             
             # Add creator as participant (side A)
             c.execute('''INSERT INTO bet_participants (bet_id, user_id, side)
@@ -200,17 +247,42 @@ class DatabaseManager:
         conn = self.get_connection()
         c = conn.cursor()
         
-        c.execute("SELECT * FROM bets WHERE bet_id = ?", (bet_id,))
+        # Use explicit column names to avoid misalignment issues
+        c.execute('''SELECT bet_id, creator_id, bet_topic, bet_description, amount,
+                    COALESCE(bet_type, '1v1') as bet_type,
+                    COALESCE(category, 'Random') as category,
+                    COALESCE(odds, 'even') as odds,
+                    COALESCE(visibility, 'open') as visibility,
+                    COALESCE(expiration, '7d') as expiration,
+                    COALESCE(status, 'open') as status,
+                    COALESCE(verification_type, 'manual') as verification_type,
+                    proof_url, scheduled_resolve_time, created_at, resolved_at, winner_id
+                    FROM bets WHERE bet_id = ?''', (bet_id,))
         row = c.fetchone()
-        conn.close()
         
         if row:
-            return {
-                'bet_id': row[0], 'creator_id': row[1], 'bet_topic': row[2],
-                'bet_description': row[3], 'amount': row[4], 'bet_type': row[5],
-                'status': row[6], 'created_at': row[7], 'resolved_at': row[8],
-                'winner_id': row[9]
+            result = {
+                'bet_id': row[0],
+                'creator_id': row[1],
+                'bet_topic': row[2],
+                'bet_description': row[3],
+                'amount': row[4],
+                'bet_type': row[5],
+                'category': row[6],
+                'odds': row[7],
+                'visibility': row[8],
+                'expiration': row[9],
+                'status': row[10],
+                'verification_type': row[11],
+                'proof_url': row[12],
+                'scheduled_resolve_time': row[13],
+                'created_at': row[14],
+                'resolved_at': row[15],
+                'winner_id': row[16]
             }
+            conn.close()
+            return result
+        conn.close()
         return None
     
     def get_bet_participants(self, bet_id: str) -> List[Dict]:
@@ -351,6 +423,145 @@ class DatabaseManager:
             results.append({
                 'bet_id': row[0], 'bet_topic': row[1], 'amount': row[2],
                 'status': row[3], 'created_at': row[4], 'winner_id': row[5]
+            })
+        
+        conn.close()
+        return results
+    
+    # ============== BET FIELD UPDATES ==============
+    
+    def update_bet(self, bet_id: str, **kwargs) -> bool:
+        """Update bet fields"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        try:
+            fields = ', '.join(f"{k} = ?" for k in kwargs.keys())
+            values = list(kwargs.values())
+            values.append(bet_id)
+            
+            c.execute(f"UPDATE bets SET {fields} WHERE bet_id = ?", values)
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error updating bet: {e}")
+            conn.rollback()
+            conn.close()
+            return False
+    
+    def set_bet_verification_type(self, bet_id: str, verification_type: str) -> bool:
+        """Set verification type for a bet"""
+        return self.update_bet(bet_id, verification_type=verification_type)
+    
+    def set_bet_proof_url(self, bet_id: str, proof_url: str) -> bool:
+        """Set proof URL for a bet"""
+        return self.update_bet(bet_id, proof_url=proof_url)
+    
+    def set_scheduled_resolve_time(self, bet_id: str, resolve_time: str) -> bool:
+        """Set scheduled resolution time for a bet"""
+        return self.update_bet(bet_id, scheduled_resolve_time=resolve_time)
+    
+    # ============== BET TAGS ==============
+    
+    def add_bet_tag(self, bet_id: str, tag: str) -> bool:
+        """Add a tag to a bet"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        try:
+            c.execute("INSERT INTO bet_tags (bet_id, tag) VALUES (?, ?)", (bet_id, tag))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error adding bet tag: {e}")
+            conn.close()
+            return False
+    
+    def get_bet_tags(self, bet_id: str) -> List[str]:
+        """Get all tags for a bet"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        c.execute("SELECT tag FROM bet_tags WHERE bet_id = ?", (bet_id,))
+        tags = [row[0] for row in c.fetchall()]
+        conn.close()
+        return tags
+    
+    # ============== BET VOTES (Poll Verification) ==============
+    
+    def add_vote(self, bet_id: str, user_id: str, voted_for: str) -> bool:
+        """Add a vote for a bet"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        try:
+            # Remove previous vote if exists
+            c.execute("DELETE FROM bet_votes WHERE bet_id = ? AND user_id = ?", (bet_id, user_id))
+            c.execute("INSERT INTO bet_votes (bet_id, user_id, voted_for) VALUES (?, ?, ?)", 
+                     (bet_id, user_id, voted_for))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error adding vote: {e}")
+            conn.close()
+            return False
+    
+    def get_bet_votes(self, bet_id: str) -> Dict[str, int]:
+        """Get vote counts for a bet"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        c.execute("SELECT voted_for, COUNT(*) FROM bet_votes WHERE bet_id = ? GROUP BY voted_for", (bet_id,))
+        votes = {row[0]: row[1] for row in c.fetchall()}
+        conn.close()
+        return votes
+    
+    def get_user_vote(self, bet_id: str, user_id: str) -> Optional[str]:
+        """Get what a user voted for"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        c.execute("SELECT voted_for FROM bet_votes WHERE bet_id = ? AND user_id = ?", (bet_id, user_id))
+        row = c.fetchone()
+        conn.close()
+        return row[0] if row else None
+    
+    # ============== BET PROOF (Link Proof) ==============
+    
+    def submit_proof(self, bet_id: str, user_id: str, proof_url: str, description: str = None) -> bool:
+        """Submit proof for a bet"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        try:
+            c.execute("INSERT INTO bet_proof (bet_id, user_id, proof_url, description) VALUES (?, ?, ?, ?)",
+                     (bet_id, user_id, proof_url, description))
+            conn.commit()
+            conn.close()
+            return True
+        except Exception as e:
+            logger.error(f"Error submitting proof: {e}")
+            conn.close()
+            return False
+    
+    def get_bet_proof(self, bet_id: str) -> List[Dict]:
+        """Get all proof submissions for a bet"""
+        conn = self.get_connection()
+        c = conn.cursor()
+        
+        c.execute('''SELECT bp.user_id, u.display_name, bp.proof_url, bp.description, bp.submitted_at
+                    FROM bet_proof bp
+                    JOIN users u ON bp.user_id = u.user_id
+                    WHERE bp.bet_id = ?''', (bet_id,))
+        
+        results = []
+        for row in c.fetchall():
+            results.append({
+                'user_id': row[0], 'display_name': row[1], 
+                'proof_url': row[2], 'description': row[3], 'submitted_at': row[4]
             })
         
         conn.close()

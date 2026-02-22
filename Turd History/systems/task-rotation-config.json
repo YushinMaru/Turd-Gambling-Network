@@ -1,0 +1,127 @@
+{
+  "version": "1.0.0",
+  "created_by": "AUTO-004",
+  "last_modified": "2025-05-07",
+  
+  "queue_limits": {
+    "active_queue_max_lines": 50,
+    "active_queue_warning_threshold": 45,
+    "active_queue_min_lines": 40,
+    "completed_tasks_max_count": 30
+  },
+  
+  "priority_values": {
+    "HIGH": 100,
+    "MEDIUM": 50,
+    "LOW": 10,
+    "CRITICAL": 150
+  },
+  
+  "rotation_triggers": {
+    "space_available": {
+      "enabled": true,
+      "min_lines_threshold": 40,
+      "target_lines": 45
+    },
+    
+    "task_completion": {
+      "enabled": true,
+      "immediate_replacement": true,
+      "preserve_domain": true
+    },
+    
+    "priority_threshold": {
+      "enabled": true,
+      "minimum_priority_difference": 30,
+      "force_critical_priority": true
+    },
+    
+    "dependency_resolution": {
+      "enabled": true,
+      "dependency_priority_boost": 50,
+      "boost_duration_days": 2
+    },
+    
+    "domain_balance": {
+      "enabled": true,
+      "minimum_domain_representation": 1,
+      "domain_balance_modifier": 20,
+      "enforce_on_rotation": true
+    },
+    
+    "age_threshold": {
+      "enabled": true,
+      "age_factor_per_day": 1,
+      "high_priority_max_wait_days": 14,
+      "medium_priority_max_wait_days": 30,
+      "low_priority_max_wait_days": 60
+    }
+  },
+  
+  "domain_configuration": {
+    "CHARACTER": {
+      "min_representation": 2,
+      "max_representation": 4,
+      "extended_storage_path": "extended/character-tasks.md"
+    },
+    "TIMELINE": {
+      "min_representation": 1,
+      "max_representation": 3,
+      "extended_storage_path": "extended/timeline-tasks.md"
+    },
+    "CORPORATE": {
+      "min_representation": 1,
+      "max_representation": 3,
+      "extended_storage_path": "extended/corporate-tasks.md"
+    },
+    "RELATIONSHIP": {
+      "min_representation": 1,
+      "max_representation": 3,
+      "extended_storage_path": "extended/relationship-tasks.md"
+    },
+    "WORLDBUILDING": {
+      "min_representation": 1,
+      "max_representation": 2,
+      "extended_storage_path": "extended/worldbuilding-tasks.md"
+    },
+    "AUTOMATION": {
+      "min_representation": 1,
+      "max_representation": 2,
+      "extended_storage_path": "extended/automation-tasks.md"
+    }
+  },
+  
+  "protection_rules": {
+    "in_progress_protection": {
+      "enabled": true,
+      "override_on_emergency": false
+    },
+    "new_promotion_protection": {
+      "enabled": true,
+      "protection_hours": 24
+    },
+    "user_flagged_protection": {
+      "enabled": true,
+      "override_on_emergency": true
+    },
+    "sole_domain_protection": {
+      "enabled": true,
+      "override_on_emergency": true
+    }
+  },
+  
+  "rotation_logging": {
+    "log_file": "systems/logs/task-rotation.log",
+    "detailed_logging": true,
+    "keep_history_days": 30,
+    "rotation_report_path": "systems/reports/task-rotation-report-{date}.md"
+  },
+  
+  "advanced_options": {
+    "user_interest_factor": 50,
+    "recent_activity_days": 3,
+    "conflict_resolution_strategy": "priority_based",
+    "emergency_overflow_threshold": 55,
+    "emergency_actions_enabled": true
+  }
+}

@@ -1,0 +1,54 @@
+# {{CHARACTER_NAME}} - Physical Attributes
+**Edition #1.0.0 | Created: ({{CREATOR_ID}}) | Last Modified: ({{CREATOR_ID}})**
+
+> Previous: None (Initial Documentation)
+
+> **⚠️ FILE SIZE LIMITATION: DO NOT CREATE ANY MORE LINES IN THIS DOCUMENT UNLESS NECESSARY.**
+> **ANY NEW LARGE ADDITIONS SHOULD FOLLOW REFACTORING AFTER 150 LINES.**
+
+## Context
+This document details the physical appearance and characteristics of {{CHARACTER_NAME}}, including distinctive features, mannerisms, and visual presentation. These physical attributes contribute to the character's unique identity within the Turd Bird Universe.
+
+## Physical Characteristics
+
+### General Appearance
+- Height: [Height details]
+- Build: [Build characteristics]
+- Coloration: [Skin/fur/scale details]
+- Age Appearance: [Apparent age and aging characteristics]
+- Distinguishing Features: [Notable physical traits]
+
+### Facial Features
+- Eyes: [Eye details]
+- Hair: [Hair details]
+- Facial Structure: [Shape, bones, etc.]
+- Expression: [Common expressions and microexpressions]
+
+### Movement & Posture
+- Gait: [Walking/movement style]
+- Posture: [Habitual body positioning]
+- Gestures: [Characteristic movements]
+- Physical Mannerisms: [Recurring physical behaviors]
+
+### Clothing & Accessories
+- Standard Attire: [Typical clothing choices]
+- Distinctive Items: [Signature accessories]
+- Style Evolution: [Changes in appearance over time]
+- Symbolic Elements: [Items with narrative significance]
+
+### Sensory Characteristics
+- Voice: [Vocal qualities]
+- Scent: [If relevant]
+- Other Sensory Notes: [Any other distinctive sensory aspects]
+
+## Visual Reference Guidelines
+[Guidelines for visualizing this character, including consistent elements that should be maintained across all depictions]
+
+## References
+- [/_profile/character-{{CHARACTER_KEBAB}}-overview-brief.md § CORE-IDENTITY]
+- [/expressions/character-{{CHARACTER_KEBAB}}-communication-style.md § PHYSICAL-COMPONENTS]
+- [/possessions/character-{{CHARACTER_KEBAB}}-signature-items.md § APPEARANCE-ELEMENTS]
+
+## Version History
+### v1.0.0 - {{CREATED_DATE}}
+- Initial documentation created via directory template generator

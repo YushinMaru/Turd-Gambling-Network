@@ -45,8 +45,15 @@ class DatabaseInitializer:
                 bet_topic TEXT NOT NULL,
                 bet_description TEXT,
                 amount INTEGER NOT NULL,
-                bet_type TEXT DEFAULT 'peer',
+                bet_type TEXT DEFAULT '1v1',
+                category TEXT DEFAULT 'Random',
+                odds TEXT DEFAULT 'even',
+                visibility TEXT DEFAULT 'open',
+                expiration TEXT DEFAULT '7d',
                 status TEXT DEFAULT 'open',
+                verification_type TEXT DEFAULT 'manual',
+                proof_url TEXT,
+                scheduled_resolve_time TEXT,
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 resolved_at TEXT,
                 winner_id TEXT,
@@ -93,9 +100,83 @@ class DatabaseInitializer:
             )
         ''')
         
+        # Create bet_tags table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS bet_tags (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                bet_id TEXT NOT NULL,
+                tag TEXT NOT NULL,
+                FOREIGN KEY (bet_id) REFERENCES bets(bet_id)
+            )
+        ''')
+        
+        # Create bet_votes table for poll verification
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS bet_votes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                bet_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                voted_for TEXT NOT NULL,
+                voted_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (bet_id) REFERENCES bets(bet_id),
+                FOREIGN KEY (user_id) REFERENCES users(user_id)
+            )
+        ''')
+        
+        # Create bet_proof table for link proof verification
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS bet_proof (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                bet_id TEXT NOT NULL,
+                user_id TEXT NOT NULL,
+                proof_url TEXT NOT NULL,
+                description TEXT,
+                submitted_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (bet_id) REFERENCES bets(bet_id),
+                FOREIGN KEY (user_id) REFERENCES users(user_id)
+            )
+        ''')
+        
         conn.commit()
+        
+        # Migration: Add missing columns to existing tables
+        self._migrate_bets_table(cursor)
+        
         conn.close()
         logger.info("Database initialized successfully")
+    
+    def _migrate_bets_table(self, cursor):
+        """Add missing columns to bets table for existing databases"""
+        try:
+            # Get current columns
+            cursor.execute("PRAGMA table_info(bets)")
+            existing_columns = [row[1] for row in cursor.fetchall()]
+            
+            migrations = {
+                'bet_type': "ALTER TABLE bets ADD COLUMN bet_type TEXT DEFAULT '1v1'",
+                'category': "ALTER TABLE bets ADD COLUMN category TEXT DEFAULT 'Random'",
+                'odds': "ALTER TABLE bets ADD COLUMN odds TEXT DEFAULT 'even'",
+                'visibility': "ALTER TABLE bets ADD COLUMN visibility TEXT DEFAULT 'open'",
+                'expiration': "ALTER TABLE bets ADD COLUMN expiration TEXT DEFAULT '7d'",
+                'status': "ALTER TABLE bets ADD COLUMN status TEXT DEFAULT 'open'",
+                'verification_type': "ALTER TABLE bets ADD COLUMN verification_type TEXT DEFAULT 'manual'",
+                'proof_url': "ALTER TABLE bets ADD COLUMN proof_url TEXT",
+                'scheduled_resolve_time': "ALTER TABLE bets ADD COLUMN scheduled_resolve_time TEXT",
+                'created_at': "ALTER TABLE bets ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP",
+                'resolved_at': "ALTER TABLE bets ADD COLUMN resolved_at TEXT",
+                'winner_id': "ALTER TABLE bets ADD COLUMN winner_id TEXT"
+            }
+            
+            for col, sql in migrations.items():
+                if col not in existing_columns:
+                    try:
+                        cursor.execute(sql)
+                        logger.info(f"Migration: Added column {col} to bets table")
+                    except Exception as e:
+                        logger.warning(f"Migration error for {col}: {e}")
+            
+        except Exception as e:
+            logger.warning(f"Migration check error: {e}")
     
     def get_connection(self) -> sqlite3.Connection:
         """Get database connection with proper settings"""

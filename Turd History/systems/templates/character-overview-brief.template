@@ -1,0 +1,52 @@
+# {{CHARACTER_NAME}} - Brief Overview
+**Edition #1.0.0 | Created: ({{CREATOR_ID}}) | Last Modified: ({{CREATOR_ID}})**
+
+> Previous: None (Initial Documentation)
+
+> **⚠️ FILE SIZE LIMITATION: DO NOT CREATE ANY MORE LINES IN THIS DOCUMENT UNLESS NECESSARY.**
+> **ANY NEW LARGE ADDITIONS SHOULD FOLLOW REFACTORING AFTER 150 LINES.**
+
+## Context
+This document provides a concise overview of {{CHARACTER_NAME}}, including essential information about their identity, role, and significance within the Turd Bird Universe. It serves as the central reference point connecting to more detailed component files.
+
+## Core Identity
+
+**Role:** [Character's primary role/position]
+**Status:** [Active/Inactive/Departed/etc.]
+**First Appearance:** [Timeline point of first introduction]
+**Key Relationships:** [List of most significant relationships]
+
+### Essential Traits
+- [Trait 1]
+- [Trait 2]
+- [Trait 3]
+- [Trait 4]
+- [Trait 5]
+
+### Narrative Significance
+[Brief description of character's importance to the overall narrative]
+
+## Component Documentation
+
+The following component files contain detailed information about specific aspects of {{CHARACTER_NAME}}:
+
+### Profile Elements
+- [/_profile/attributes/character-{{CHARACTER_KEBAB}}-attributes-physical.md] - Physical attributes and presentation
+- [/_profile/attributes/character-{{CHARACTER_KEBAB}}-attributes-personality.md] - Psychological characteristics
+- [/_profile/function/character-{{CHARACTER_KEBAB}}-function-narrative.md] - Narrative role and function
+
+### Background & Development
+- [/origins/character-{{CHARACTER_KEBAB}}-childhood.md] - Early formative experiences
+- [/origins/character-{{CHARACTER_KEBAB}}-education.md] - Academic and intellectual development
+- [/development/character-{{CHARACTER_KEBAB}}-pivotal-events.md] - Transformative experiences
+
+### Current State
+- [/states/character-{{CHARACTER_KEBAB}}-state-current.md] - Present condition and status
+
+## References
+- [/registry/character-registry.md § {{CHARACTER_KEBAB_UPPER}}]
+- [/Reference.md § {{CHARACTER_KEBAB_UPPER}}]
+
+## Version History
+### v1.0.0 - {{CREATED_DATE}}
+- Initial documentation created via directory template generator

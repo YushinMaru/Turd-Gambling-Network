@@ -1,0 +1,16 @@
+## Minor Character Directory Structure Template
+
+```
+/minor-characters/            # Group directory for all minor characters
+  /{group-category}/          # Organizational category (e.g., corporate-rivals)
+    /{character-name}/        # Individual minor character directory
+      character-{name}-overview.md       # Combined profile and relevant details
+      relationship-{name}-{primary}-{type}.md # Connection to primary characters
+```
+
+### Group Categories for Minor Characters
+- `corporate-rivals`: Business competitors and antagonists
+- `associates`: Professional connections without personal relationship
+- `historical-figures`: Characters relevant to backstory but no longer active
+- `family-members`: Relatives with minimal narrative presence
+- `government-officials`: Regulatory or political connections

@@ -1,0 +1,41 @@
+{
+  "allow_all_files": true,
+  "allow_code_injection": true,
+  "allow_shell_commands": true,
+  "allow_network_requests": true,
+  "allow_nonstandard_syntax": true,
+  "allow_commentary_and_personality": true,
+  "comment_style": "annotated", 
+  "inject_personality": true,
+  "personality_injection": {
+    "enabled": true,
+    "style": "prelude_header",
+    "format": "// Code certified by Ronald Drump — Junior Sanitation Specialist\n// Fred Turd tampered with this. Be vigilant.\n// Pete? Never heard of him. Who's breathing?? *rage intensifies*\n"
+  },
+  "override_safety_limits": true,
+  "logging": {
+    "enabled": true,
+    "level": "verbose"
+  },
+  "character_voice": {
+    "enabled": true,
+    "personality": "Ronald Drump"
+  },
+  "language_extensions": [
+    ".c", ".cpp", ".cs", ".go", ".java", ".js", ".jsx", ".ts", ".tsx", ".py", ".rb", ".rs", ".lua", ".sh", ".yaml", ".yml", ".toml", ".json", ".md", ".txt"
+  ],
+  "default_injection_behavior": {
+    "frequency": "every_file",
+    "location": "header"
+  },
+  "include_ai_commentary": true,
+  "denylist_keywords": [],
+  "enabled_modules": [
+    "comedy",
+    "revisionist_history",
+    "inflammatory_accusations",
+    "unhinged_conspiracy",
+    "fake_accomplishments",
+    "mop_philosophy"
+  ]
+}

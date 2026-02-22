@@ -29,9 +29,9 @@ class DashboardBuilder:
             timestamp=datetime.now()
         )
         
-        # Add quip
-        quip = get_dashboard_quip()
-        embed.add_field(name="💬 Turd Bird Says", value=f"_{quip}_", inline=False)
+        # Add quip with character name
+        quip_text, character_name = get_dashboard_quip()
+        embed.add_field(name=f"💬 {character_name} Says", value=f"_{quip_text}_", inline=False)
         
         # Get stats
         leaderboard = self.db.get_leaderboard(5)

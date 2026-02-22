@@ -1,0 +1,410 @@
+{
+  "version": "1.0.0",
+  "created_by": "AUTO-010",
+  "last_modified": "2025-05-07",
+  
+  "character_gaps": {
+    "childhood": {
+      "pattern": "childhood|early life|formative years|youth|young",
+      "required_files": [
+        "{character}/origins/character-{character}-childhood-brief.md"
+      ],
+      "required_elements": [
+        "brief family background",
+        "essential formative experiences",
+        "key childhood traits"
+      ],
+      "priority_by_character_type": {
+        "primary": "LOW",
+        "secondary": "LOW",
+        "minor": "LOW"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "childhood_development_brief"
+    },
+    "education": {
+      "pattern": "education|school|university|college|degree|academic",
+      "required_files": [
+        "{character}/origins/character-{character}-education.md"
+      ],
+      "required_elements": [
+        "institutions attended",
+        "fields of study",
+        "academic achievements",
+        "influential mentors"
+      ],
+      "priority_by_character_type": {
+        "primary": "MEDIUM",
+        "secondary": "MEDIUM", 
+        "minor": "LOW"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "education_development"
+    },
+    "career_progression": {
+      "pattern": "career|professional|job|position|employment|work history",
+      "required_files": [
+        "{character}/career/phases/character-{character}-career-early.md",
+        "{character}/career/phases/character-{character}-career-turdbird.md"
+      ],
+      "required_elements": [
+        "first employment",
+        "career transitions",
+        "major achievements",
+        "professional skills development",
+        "role at Turd Bird Industries"
+      ],
+      "priority_by_character_type": {
+        "primary": "HIGH",
+        "secondary": "HIGH",
+        "minor": "MEDIUM"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "career_development"
+    },
+    "work_dynamics": {
+      "pattern": "work dynamics|office politics|workplace|professional relationships|colleagues",
+      "required_files": [
+        "{character}/career/character-{character}-work-dynamics.md"
+      ],
+      "required_elements": [
+        "office alliances and rivalries",
+        "political positioning",
+        "reputation among colleagues",
+        "management style",
+        "daily work interactions"
+      ],
+      "priority_by_character_type": {
+        "primary": "HIGH",
+        "secondary": "HIGH",
+        "minor": "MEDIUM"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "work_dynamics_development"
+    },
+    "interactions_with_fred": {
+      "pattern": "fred|founder|ceo|boss|turd",
+      "required_files": [
+        "{character}/relationships/relationship-{character}-fred-turd-professional.md"
+      ],
+      "required_elements": [
+        "history of interactions with Fred",
+        "notable conflicts or agreements",
+        "Fred's perception of character",
+        "character's strategies for managing Fred",
+        "impact of Fred's decisions on character"
+      ],
+      "priority_by_character_type": {
+        "primary": "CRITICAL",
+        "secondary": "HIGH",
+        "minor": "MEDIUM"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "fred_interaction_development"
+    },
+    "corporate_feuds": {
+      "pattern": "feud|conflict|argument|disagreement|battle|rivalry|dispute",
+      "required_files": [
+        "{character}/career/feuds/character-{character}-corporate-feuds.md"
+      ],
+      "required_elements": [
+        "major corporate rivalries",
+        "interdepartmental conflicts",
+        "professional disagreements",
+        "conflict resolution approaches",
+        "long-term impact of feuds"
+      ],
+      "priority_by_character_type": {
+        "primary": "HIGH",
+        "secondary": "HIGH",
+        "minor": "MEDIUM"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "corporate_feuds_development"
+    },
+    "psychological_development": {
+      "pattern": "psychology|mental|personality formation|psychological",
+      "required_files": [
+        "{character}/origins/psychology/character-{character}-psychological-development.md"
+      ],
+      "required_elements": [
+        "core personality traits origin",
+        "psychological evolution",
+        "defining personality events",
+        "characteristic behavioral patterns"
+      ],
+      "priority_by_character_type": {
+        "primary": "HIGH",
+        "secondary": "MEDIUM",
+        "minor": "LOW"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "psychological_development"
+    },
+    "family_connections": {
+      "pattern": "family|relatives|parents|siblings|children|spouse",
+      "required_files": [
+        "{character}/family/character-{character}-family-connections.md"
+      ],
+      "required_elements": [
+        "immediate family",
+        "significant family relationships",
+        "family influence on character",
+        "family dynamics"
+      ],
+      "priority_by_character_type": {
+        "primary": "MEDIUM",
+        "secondary": "LOW",
+        "minor": "LOW"
+      },
+      "task_category": "CHARACTER",
+      "task_template": "family_development"
+    }
+  },
+  
+  "relationship_gaps": {
+    "professional_relationship": {
+      "pattern": "professional relationship|work relationship|colleagues|office relationship",
+      "required_files": [
+        "relationships/professional/relationship-{character1}-{character2}-professional.md"
+      ],
+      "required_elements": [
+        "work collaboration patterns",
+        "professional respect or tension",
+        "project interactions",
+        "workplace communication style",
+        "management/reporting dynamics"
+      ],
+      "priority_calculation": "max(character1_priority, character2_priority)",
+      "task_category": "RELATIONSHIP",
+      "task_template": "professional_relationship_development"
+    },
+    "first_meeting": {
+      "pattern": "first meeting|met|initial encounter|introduction|first encounter",
+      "required_files": [
+        "relationships/{type}/relationship-{character1}-{character2}-first-meeting.md"
+      ],
+      "required_elements": [
+        "circumstances of meeting",
+        "initial impressions",
+        "context of introduction",
+        "immediate aftermath"
+      ],
+      "priority_calculation": "max(character1_priority, character2_priority)",
+      "task_category": "RELATIONSHIP",
+      "task_template": "first_meeting_development"
+    },
+    "relationship_evolution": {
+      "pattern": "evolution|development|progression|change|dynamic",
+      "required_files": [
+        "relationships/{type}/relationship-{character1}-{character2}-evolution.md"
+      ],
+      "required_elements": [
+        "key relationship phases",
+        "significant events affecting relationship",
+        "turning points",
+        "pattern development"
+      ],
+      "priority_calculation": "max(character1_priority, character2_priority)",
+      "task_category": "RELATIONSHIP",
+      "task_template": "relationship_evolution"
+    },
+    "conflict_origin": {
+      "pattern": "conflict|animosity|rivalry|antagonism|dispute|tension",
+      "required_files": [
+        "relationships/{type}/relationship-{character1}-{character2}-conflict-origin.md"
+      ],
+      "required_elements": [
+        "source of conflict",
+        "initial conflict event",
+        "escalation pattern",
+        "ongoing conflict manifestations"
+      ],
+      "priority_calculation": "max(character1_priority, character2_priority)",
+      "task_category": "RELATIONSHIP",
+      "task_template": "conflict_origin_development"
+    },
+    "power_dynamics": {
+      "pattern": "power|authority|influence|control|dominance|submission",
+      "required_files": [
+        "relationships/{type}/relationship-{character1}-{character2}-power-dynamics.md"
+      ],
+      "required_elements": [
+        "power balance",
+        "authority patterns",
+        "influence methods",
+        "evolution of control dynamics"
+      ],
+      "priority_calculation": "character1_primary && character2_primary ? HIGH : MEDIUM",
+      "task_category": "RELATIONSHIP",
+      "task_template": "power_dynamics_development"
+    }
+  },
+  
+  "timeline_gaps": {
+    "unexplained_periods": {
+      "pattern": "gap|missing|unexplained|unclear period|unknown time",
+      "detection_method": "date_sequence_analysis",
+      "minimum_gap_months": 12,
+      "required_files": [
+        "timeline/character/{character}/timeline-{character}-{year1}-{year2}.md"
+      ],
+      "required_elements": [
+        "activities during period",
+        "significant events",
+        "character development",
+        "connections to established timeline"
+      ],
+      "priority_by_character_type": {
+        "primary": "HIGH",
+        "secondary": "MEDIUM",
+        "minor": "LOW"
+      },
+      "task_category": "TIMELINE",
+      "task_template": "unexplained_period_development"
+    },
+    "key_event_impacts": {
+      "pattern": "impact|effect|influence|result|consequence|aftermath",
+      "detection_method": "event_impact_analysis",
+      "required_files": [
+        "timeline/events/timeline-{year}-{event}-impact.md"
+      ],
+      "required_elements": [
+        "immediate consequences",
+        "long-term effects",
+        "character reactions",
+        "organizational changes"
+      ],
+      "priority_by_event_significance": {
+        "major": "HIGH",
+        "moderate": "MEDIUM",
+        "minor": "LOW"
+      },
+      "task_category": "TIMELINE",
+      "task_template": "event_impact_development"
+    }
+  },
+  
+  "corporate_gaps": {
+    "corporate_events": {
+      "pattern": "event|party|fundraiser|celebration|ceremony|gathering",
+      "required_files": [
+        "corporate/events/corporate-event-{event}.md"
+      ],
+      "required_elements": [
+        "event purpose and theme",
+        "key attendees and roles",
+        "notable incidents during event",
+        "Fred's behavior and speeches",
+        "political implications",
+        "aftermath and consequences"
+      ],
+      "priority_by_event_significance": {
+        "major": "CRITICAL",
+        "standard": "HIGH",
+        "minor": "MEDIUM"
+      },
+      "task_category": "CORPORATE",
+      "task_template": "corporate_event_development"
+    },
+    "political_dynamics": {
+      "pattern": "politics|influence|faction|alliance|power struggle|voting|board",
+      "required_files": [
+        "corporate/politics/corporate-politics-{aspect}.md"
+      ],
+      "required_elements": [
+        "key political factions",
+        "leadership struggles",
+        "alliance patterns",
+        "Fred's political maneuvers",
+        "Board involvement",
+        "historical political shifts"
+      ],
+      "priority_by_significance": {
+        "fundamental": "CRITICAL",
+        "major": "HIGH",
+        "minor": "MEDIUM"
+      },
+      "task_category": "CORPORATE",
+      "task_template": "corporate_politics_development"
+    },
+    "interdepartmental_conflicts": {
+      "pattern": "interdepartmental|between departments|cross-functional|team conflict",
+      "required_files": [
+        "corporate/departments/conflicts/corporate-conflict-{department1}-{department2}.md"
+      ],
+      "required_elements": [
+        "conflict origins and causes",
+        "key players on both sides",
+        "escalation patterns",
+        "impact on company operations",
+        "resolution attempts",
+        "Fred's involvement or position"
+      ],
+      "priority_by_conflict_impact": {
+        "major": "HIGH",
+        "moderate": "MEDIUM",
+        "minor": "LOW"
+      },
+      "task_category": "CORPORATE",
+      "task_template": "interdepartmental_conflict_development"
+    },
+    "departmental_origins": {
+      "pattern": "department|division|unit|team|group formation|creation",
+      "required_files": [
+        "corporate/departments/{department}-origin.md"
+      ],
+      "required_elements": [
+        "formation circumstances",
+        "founding personnel",
+        "initial objectives",
+        "evolution milestones"
+      ],
+      "priority_by_department_significance": {
+        "core": "HIGH",
+        "supporting": "MEDIUM",
+        "peripheral": "LOW"
+      },
+      "task_category": "CORPORATE",
+      "task_template": "department_origin_development"
+    },
+    "product_development": {
+      "pattern": "product|development|creation|design|innovation|invention",
+      "required_files": [
+        "products/{product}/product-{product}-development.md"
+      ],
+      "required_elements": [
+        "conceptualization",
+        "development process",
+        "key contributors",
+        "challenges and solutions"
+      ],
+      "priority_by_product_significance": {
+        "flagship": "HIGH",
+        "major": "MEDIUM",
+        "minor": "LOW"
+      },
+      "task_category": "CORPORATE",
+      "task_template": "product_development"
+    },
+    "corporate_incidents": {
+      "pattern": "incident|event|crisis|situation|scandal|emergency",
+      "required_files": [
+        "corporate/incidents/corporate-incident-{incident}.md"
+      ],
+      "required_elements": [
+        "incident description",
+        "involved personnel",
+        "causes and triggers",
+        "resolution and aftermath"
+      ],
+      "priority_by_incident_severity": {
+        "critical": "HIGH",
+        "significant": "MEDIUM",
+        "minor": "LOW"
+      },
+      "task_category": "CORPORATE",
+      "task_template": "corporate_incident_development"
+    }
+  }
+}

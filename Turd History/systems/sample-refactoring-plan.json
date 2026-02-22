@@ -1,0 +1,59 @@
+{
+  "metadata": {
+    "refactoring_id": "REFAC-TEST-001",
+    "description": "Sample refactoring plan for Pneumonia Pete files",
+    "created_by": "NEUR-ARC-011",
+    "created_date": "2025-05-07"
+  },
+  "file_mappings": [
+    {
+      "original": "characters/pneumonia-pete/_profile/function/character-pneumonia-pete-function-narrative.md",
+      "refactored": [
+        {
+          "path": "characters/pneumonia-pete/_profile/function/character-pneumonia-pete-function-narrative-core.md",
+          "sections": {
+            "CORE-FUNCTIONS": "CORE-FUNCTIONS",
+            "NARRATIVE-PURPOSE": "NARRATIVE-PURPOSE"
+          }
+        },
+        {
+          "path": "characters/pneumonia-pete/_profile/function/character-pneumonia-pete-function-narrative-evolution.md",
+          "sections": {
+            "EVOLUTION": "EVOLUTION",
+            "JUXTAPOSITION": "JUXTAPOSITION"
+          }
+        }
+      ]
+    },
+    {
+      "original": "characters/pneumonia-pete/medical/character-pneumonia-pete-pneumonia-catalog.md",
+      "refactored": [
+        {
+          "path": "characters/pneumonia-pete/medical/character-pneumonia-pete-pneumonia-catalog-overview.md",
+          "sections": {
+            "OVERVIEW": "OVERVIEW",
+            "STATISTICS": "STATISTICS"
+          }
+        },
+        {
+          "path": "characters/pneumonia-pete/medical/character-pneumonia-pete-pneumonia-cases-childhood.md",
+          "sections": {
+            "CHILDHOOD-CASES": "CHILDHOOD-CASES"
+          }
+        },
+        {
+          "path": "characters/pneumonia-pete/medical/character-pneumonia-pete-pneumonia-analysis-core.md",
+          "sections": {
+            "MEDICAL-ANALYSIS": "MEDICAL-ANALYSIS"
+          }
+        },
+        {
+          "path": "characters/pneumonia-pete/medical/character-pneumonia-pete-pneumonia-analysis-severity.md",
+          "sections": {
+            "SEVERITY-ANALYSIS": "SEVERITY-ANALYSIS"
+          }
+        }
+      ]
+    }
+  ]
+}

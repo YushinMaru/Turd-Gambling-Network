@@ -1,0 +1,448 @@
+{
+  "version": "1.0.0",
+  "created_by": "AUTO-010",
+  "last_modified": "2025-05-07",
+  
+  "templates": {
+    "childhood_development_brief": {
+      "title_format": "Create Brief Childhood Background for {character}",
+      "description_format": "Create a brief documentation of {character}'s childhood, focusing only on essential elements that directly influenced their adult personality and career. Keep this concise and focused on foundational traits.",
+      "acceptance_criteria": [
+        "Document basic family background in 1-2 paragraphs",
+        "Describe 1-2 key formative experiences that shaped personality",
+        "Establish relevance to adult traits and career choices",
+        "Create proper file structure following modular architecture",
+        "Update character registry with basic childhood information"
+      ],
+      "file_generation": [
+        "{character}/origins/character-{character}-childhood-brief.md"
+      ]
+    },
+    
+    "childhood_development": {
+      "title_format": "Develop {character}'s Childhood Background",
+      "description_format": "Create documentation of {character}'s childhood experiences, focusing on family dynamics, education, formative experiences, and early personality development. This documentation should establish the foundation for {character}'s adult traits and provide context for established behaviors.",
+      "acceptance_criteria": [
+        "Document family structure and dynamics during childhood",
+        "Detail education experiences and academic development",
+        "Describe formative incidents that shaped personality",
+        "Explain origin of key character traits",
+        "Establish appropriate timeline references to childhood events",
+        "Ensure consistency with established adult personality",
+        "Create proper file structure following modular architecture",
+        "Update character registry with childhood information"
+      ],
+      "file_generation": [
+        "{character}/origins/character-{character}-childhood.md",
+        "{character}/origins/phases/character-{character}-childhood-early.md",
+        "{character}/origins/phases/character-{character}-childhood-middle.md",
+        "{character}/origins/phases/character-{character}-childhood-late.md"
+      ]
+    },
+    
+    "education_development": {
+      "title_format": "Document {character}'s Educational Background",
+      "description_format": "Create detailed documentation of {character}'s educational history, including institutions attended, fields of study, academic achievements, and influential mentors. This documentation should explain the origins of {character}'s knowledge base and establish educational foundations for professional capabilities.",
+      "acceptance_criteria": [
+        "Document all educational institutions attended with dates",
+        "Detail fields of study and academic focus areas",
+        "Describe notable academic achievements and failures",
+        "Identify key mentors and their influence",
+        "Explain how education shaped character development",
+        "Connect educational background to professional capabilities",
+        "Create proper file structure following modular architecture",
+        "Update character registry with education information"
+      ],
+      "file_generation": [
+        "{character}/origins/character-{character}-education.md",
+        "{character}/origins/education/character-{character}-education-institutions.md",
+        "{character}/origins/education/character-{character}-education-achievements.md"
+      ]
+    },
+    
+    "career_development": {
+      "title_format": "Document {character}'s Career Progression",
+      "description_format": "Create detailed documentation of {character}'s career trajectory, including first employment, major positions held, career transitions, and professional achievements. This documentation should establish the professional evolution that led to current position and provide context for professional relationships.",
+      "acceptance_criteria": [
+        "Document first employment with details on role and company",
+        "Detail chronological progression of positions with dates",
+        "Describe major career achievements and setbacks",
+        "Document role and position at Turd Bird Industries in detail",
+        "Explain reporting structure and departmental affiliations",
+        "Identify key professional relationships and mentorships",
+        "Connect career progression to current role and capabilities",
+        "Create proper file structure following modular architecture",
+        "Update character registry with career information"
+      ],
+      "file_generation": [
+        "{character}/career/character-{character}-career-overview.md",
+        "{character}/career/phases/character-{character}-career-early.md",
+        "{character}/career/phases/character-{character}-career-turdbird.md",
+        "{character}/career/phases/character-{character}-career-current.md"
+      ]
+    },
+    
+    "work_dynamics_development": {
+      "title_format": "Document {character}'s Workplace Dynamics and Politics",
+      "description_format": "Create detailed documentation of {character}'s workplace relationships, political positioning, and office dynamics within Turd Bird Industries. This documentation should explore their alliances, rivalries, reputation, and strategies for navigating the company's complex political landscape.",
+      "acceptance_criteria": [
+        "Document key workplace alliances and who they trust",
+        "Detail significant rivalries and sources of tension",
+        "Describe political positioning and faction affiliations",
+        "Explain strategies for navigating corporate politics",
+        "Document management style or responses to management",
+        "Identify reputation among colleagues and departments",
+        "Detail involvement in notable office politics incidents",
+        "Create proper file structure following modular architecture",
+        "Update character registry with workplace dynamics information"
+      ],
+      "file_generation": [
+        "{character}/career/character-{character}-work-dynamics.md",
+        "{character}/career/politics/character-{character}-political-positioning.md",
+        "{character}/career/dynamics/character-{character}-workplace-reputation.md"
+      ]
+    },
+    
+    "fred_interaction_development": {
+      "title_format": "Document {character}'s Interactions with Fred Turd",
+      "description_format": "Create comprehensive documentation of {character}'s professional relationship with Fred Turd, including its evolution, key interactions, conflicts, agreements, and strategies for managing Fred's chaotic leadership. This documentation should provide detailed insight into this critical workplace relationship.",
+      "acceptance_criteria": [
+        "Document first meeting and initial impressions of Fred",
+        "Detail history of significant interactions with Fred",
+        "Describe notable conflicts or disagreements with Fred",
+        "Explain successful collaborations or agreements with Fred",
+        "Document Fred's perception and opinion of character",
+        "Detail character's strategies for managing Fred's personality",
+        "Explain impact of Fred's decisions on character's career",
+        "Document character's adaptation to Fred's leadership style",
+        "Create proper file structure following modular architecture",
+        "Update relationship registry with Fred interaction information"
+      ],
+      "file_generation": [
+        "{character}/relationships/relationship-{character}-fred-turd-professional.md",
+        "{character}/relationships/interactions/relationship-{character}-fred-turd-key-incidents.md",
+        "{character}/relationships/interactions/relationship-{character}-fred-turd-management-strategies.md"
+      ]
+    },
+    
+    "corporate_feuds_development": {
+      "title_format": "Document {character}'s Corporate Feuds and Conflicts",
+      "description_format": "Create detailed documentation of {character}'s significant workplace feuds, professional conflicts, and rivalries within Turd Bird Industries. This documentation should explore the origins, evolution, and impacts of these conflicts on both the character and the organization.",
+      "acceptance_criteria": [
+        "Document major rivalries with other executives or colleagues",
+        "Detail interdepartmental conflicts and character's role",
+        "Describe professional disagreements over projects or initiatives",
+        "Explain character's approach to conflict resolution",
+        "Document Fred's involvement or position in these conflicts",
+        "Detail long-term impact of feuds on character's career",
+        "Identify patterns in conflict behavior and triggers",
+        "Create proper file structure following modular architecture",
+        "Update character registry with corporate feuds information"
+      ],
+      "file_generation": [
+        "{character}/career/feuds/character-{character}-corporate-feuds.md",
+        "{character}/career/feuds/character-{character}-conflict-resolution.md",
+        "{character}/career/feuds/character-{character}-rivalry-patterns.md"
+      ]
+    },
+    
+    "professional_relationship_development": {
+      "title_format": "Document Professional Relationship Between {character1} and {character2}",
+      "description_format": "Create detailed documentation of the professional relationship between {character1} and {character2}, focusing on work interactions, collaboration patterns, professional respect or tension, and workplace dynamics. This documentation should explain how they interact in professional contexts and the evolution of their working relationship.",
+      "acceptance_criteria": [
+        "Document work collaboration history and patterns",
+        "Detail professional respect or tension dynamics",
+        "Describe shared project experiences and outcomes",
+        "Explain communication styles and effectiveness",
+        "Document management/reporting relationship if applicable",
+        "Identify impact of their relationship on department/company",
+        "Detail how the relationship has evolved professionally",
+        "Create proper file structure following modular architecture",
+        "Update relationship registry with professional relationship information"
+      ],
+      "file_generation": [
+        "relationships/professional/relationship-{character1}-{character2}-professional.md",
+        "relationships/professional/dynamics/relationship-{character1}-{character2}-work-dynamics.md"
+      ]
+    },
+    
+    "psychological_development": {
+      "title_format": "Document {character}'s Psychological Development",
+      "description_format": "Create comprehensive documentation of {character}'s psychological evolution, focusing on the origins of core personality traits, defining psychological events, and characteristic behavioral patterns. This documentation should explain the psychological underpinnings of established behaviors and decision patterns.",
+      "acceptance_criteria": [
+        "Document origins of core personality traits",
+        "Detail major psychological influences and their effects",
+        "Describe defining psychological events and traumas",
+        "Explain characteristic thought and decision patterns",
+        "Identify psychological strengths and vulnerabilities",
+        "Connect psychological profile to behavioral patterns",
+        "Create proper file structure following modular architecture",
+        "Update character registry with psychological information"
+      ],
+      "file_generation": [
+        "{character}/origins/psychology/character-{character}-psychological-development.md",
+        "{character}/origins/psychology/character-{character}-psychological-traits.md",
+        "{character}/origins/psychology/character-{character}-psychological-patterns.md"
+      ]
+    },
+    
+    "family_development": {
+      "title_format": "Document {character}'s Family Connections",
+      "description_format": "Create detailed documentation of {character}'s family relationships, including immediate family, extended relations, and significant family dynamics. This documentation should establish the character's family context and explain how family relationships have influenced personality and decision-making.",
+      "acceptance_criteria": [
+        "Document immediate family members with biographical details",
+        "Detail extended family connections of significance",
+        "Describe major family dynamics and their influence",
+        "Explain character's role within family structure",
+        "Identify significant family events and their impact",
+        "Connect family relationships to personality development",
+        "Create proper file structure following modular architecture",
+        "Update character registry with family information"
+      ],
+      "file_generation": [
+        "{character}/family/character-{character}-family-connections.md",
+        "{character}/family/character-{character}-family-dynamics.md",
+        "{character}/family/character-{character}-family-events.md"
+      ]
+    },
+    
+    "first_meeting_development": {
+      "title_format": "Document First Meeting Between {character1} and {character2}",
+      "description_format": "Create detailed documentation of the first encounter between {character1} and {character2}, including circumstances, initial impressions, and immediate aftermath. This documentation should establish the foundation for their relationship and explain initial dynamics that influenced future interactions.",
+      "acceptance_criteria": [
+        "Document exact circumstances of first meeting",
+        "Detail location, date, and context of encounter",
+        "Describe initial impressions from both perspectives",
+        "Explain immediate interactions and conversations",
+        "Identify significant observations or judgments formed",
+        "Connect first meeting to subsequent relationship development",
+        "Create proper file structure following modular architecture",
+        "Update relationship registry with first meeting information"
+      ],
+      "file_generation": [
+        "relationships/{type}/relationship-{character1}-{character2}-first-meeting.md"
+      ]
+    },
+    
+    "relationship_evolution": {
+      "title_format": "Document Relationship Evolution Between {character1} and {character2}",
+      "description_format": "Create comprehensive documentation of how the relationship between {character1} and {character2} has evolved over time, including key phases, significant events, turning points, and pattern development. This documentation should explain the progression from initial acquaintance to current relationship status.",
+      "acceptance_criteria": [
+        "Document chronological phases of relationship development",
+        "Detail significant events that affected relationship dynamics",
+        "Describe major turning points with causes and effects",
+        "Explain pattern development and recurring dynamics",
+        "Identify evolution of emotional connections or conflicts",
+        "Connect relationship evolution to current status",
+        "Create proper file structure following modular architecture",
+        "Update relationship registry with evolution information"
+      ],
+      "file_generation": [
+        "relationships/{type}/relationship-{character1}-{character2}-evolution.md",
+        "relationships/{type}/phases/relationship-{character1}-{character2}-phase-early.md",
+        "relationships/{type}/phases/relationship-{character1}-{character2}-phase-development.md",
+        "relationships/{type}/phases/relationship-{character1}-{character2}-phase-current.md"
+      ]
+    },
+    
+    "conflict_origin_development": {
+      "title_format": "Document Conflict Origins Between {character1} and {character2}",
+      "description_format": "Create detailed documentation of the origins of conflict between {character1} and {character2}, including initial causes, escalation patterns, and ongoing manifestations. This documentation should explain the foundation of their antagonism and provide context for established hostile interactions.",
+      "acceptance_criteria": [
+        "Document initial event or circumstance causing conflict",
+        "Detail early interactions that established antagonism",
+        "Describe escalation pattern and key conflict points",
+        "Explain perspectives of both characters on the conflict",
+        "Identify recurring conflict patterns and triggers",
+        "Connect conflict origins to current relationship status",
+        "Create proper file structure following modular architecture",
+        "Update relationship registry with conflict information"
+      ],
+      "file_generation": [
+        "relationships/{type}/relationship-{character1}-{character2}-conflict-origin.md",
+        "relationships/{type}/conflicts/relationship-{character1}-{character2}-conflicts-major.md"
+      ]
+    },
+    
+    "power_dynamics_development": {
+      "title_format": "Document Power Dynamics Between {character1} and {character2}",
+      "description_format": "Create comprehensive documentation of the power dynamics between {character1} and {character2}, including power balance, authority patterns, influence methods, and evolution of control dynamics. This documentation should explain how power and influence operate within their relationship and how these dynamics affect interactions.",
+      "acceptance_criteria": [
+        "Document power balance and its evolution over time",
+        "Detail authority patterns and their manifestations",
+        "Describe influence methods used by both characters",
+        "Explain contexts where power dynamics shift",
+        "Identify key power struggles and their outcomes",
+        "Connect power dynamics to relationship functionality",
+        "Create proper file structure following modular architecture",
+        "Update relationship registry with power dynamics information"
+      ],
+      "file_generation": [
+        "relationships/{type}/relationship-{character1}-{character2}-power-dynamics.md"
+      ]
+    },
+    
+    "unexplained_period_development": {
+      "title_format": "Document {character}'s Activities During {year1}-{year2}",
+      "description_format": "Create detailed documentation of {character}'s activities, experiences, and development during the currently unexplained period from {year1} to {year2}. This documentation should fill the timeline gap and provide continuity between established periods before and after.",
+      "acceptance_criteria": [
+        "Document location and primary activities during period",
+        "Detail significant events and their impact",
+        "Describe character development during this time",
+        "Explain how this period connects to established timeline",
+        "Identify key relationships formed or changed",
+        "Connect period to character's overall narrative arc",
+        "Create proper file structure following modular architecture",
+        "Update character registry and timeline with new information"
+      ],
+      "file_generation": [
+        "timeline/character/{character}/timeline-{character}-{year1}-{year2}.md"
+      ]
+    },
+    
+    "event_impact_development": {
+      "title_format": "Document Impact of {event} ({year})",
+      "description_format": "Create comprehensive documentation of the impacts and consequences of the {event} that occurred in {year}, including immediate aftermath, long-term effects, character reactions, and organizational changes. This documentation should explain the significance of this event within the broader narrative.",
+      "acceptance_criteria": [
+        "Document immediate consequences of the event",
+        "Detail long-term effects on characters and organization",
+        "Describe specific reactions of key characters",
+        "Explain organizational or structural changes resulting",
+        "Identify how the event influenced future developments",
+        "Connect event impact to established narrative elements",
+        "Create proper file structure following modular architecture",
+        "Update timeline registry with impact information"
+      ],
+      "file_generation": [
+        "timeline/events/timeline-{year}-{event}-impact.md",
+        "timeline/events/impacts/timeline-{year}-{event}-impacts-immediate.md",
+        "timeline/events/impacts/timeline-{year}-{event}-impacts-longterm.md"
+      ]
+    },
+    
+    "department_origin_development": {
+      "title_format": "Document Origins of {department} Department",
+      "description_format": "Create detailed documentation of the formation and early development of the {department} department, including founding circumstances, initial personnel, objectives, and evolution milestones. This documentation should explain how and why the department was created and its initial role within the organization.",
+      "acceptance_criteria": [
+        "Document exact circumstances of department formation",
+        "Detail founding date, location, and organizational context",
+        "Describe founding personnel and their backgrounds",
+        "Explain initial objectives and mandate",
+        "Identify early challenges and how they were addressed",
+        "Connect department origins to current organizational structure",
+        "Create proper file structure following modular architecture",
+        "Update corporate registry with department information"
+      ],
+      "file_generation": [
+        "corporate/departments/{department}/corporate-departments-{department}-origin.md",
+        "corporate/departments/{department}/corporate-departments-{department}-early-development.md"
+      ]
+    },
+    
+    "product_development": {
+      "title_format": "Document Development of {product}",
+      "description_format": "Create comprehensive documentation of the development process for {product}, including conceptualization, design process, key contributors, challenges, and solutions. This documentation should explain how the product was created and the significance of its development within the organization.",
+      "acceptance_criteria": [
+        "Document initial concept and inspiration",
+        "Detail development timeline with key milestones",
+        "Describe team composition and key contributors",
+        "Explain major technical or design challenges",
+        "Identify innovative solutions and breakthroughs",
+        "Connect product development to business strategy",
+        "Create proper file structure following modular architecture",
+        "Update product registry with development information"
+      ],
+      "file_generation": [
+        "products/{product}/product-{product}-development.md",
+        "products/{product}/development/product-{product}-development-challenges.md",
+        "products/{product}/development/product-{product}-development-innovations.md"
+      ]
+    },
+    
+    "corporate_incident_development": {
+      "title_format": "Document {incident} Incident ({year})",
+      "description_format": "Create detailed documentation of the {incident} incident that occurred in {year}, including description, involved personnel, causes, and resolution. This documentation should explain the significance of this incident within corporate history and its impact on operations and personnel.",
+      "acceptance_criteria": [
+        "Document precise nature of the incident",
+        "Detail date, location, and organizational context",
+        "Describe involved personnel and their roles",
+        "Explain causes and contributing factors",
+        "Identify resolution process and outcome",
+        "Connect incident to broader corporate narrative",
+        "Create proper file structure following modular architecture",
+        "Update corporate registry with incident information"
+      ],
+      "file_generation": [
+        "corporate/incidents/corporate-incident-{incident}.md",
+        "corporate/incidents/{incident}/corporate-incident-{incident}-causes.md",
+        "corporate/incidents/{incident}/corporate-incident-{incident}-resolution.md"
+      ]
+    },
+    
+    "corporate_event_development": {
+      "title_format": "Document {event} Corporate Event",
+      "description_format": "Create detailed documentation of the {event} corporate event, including purpose, theme, notable participants, significant incidents, Fred's involvement, and political implications. This documentation should capture the atmosphere, dynamics, and significance of this event within Turd Bird Industries.",
+      "acceptance_criteria": [
+        "Document event purpose, theme, and organizational context",
+        "Detail location, date, and attendance information",
+        "Describe key attendees and their roles during the event",
+        "Document Fred's behavior, speeches, and memorable moments",
+        "Explain notable incidents or controversies during the event",
+        "Identify political implications and faction maneuvering",
+        "Detail aftermath and consequences of the event",
+        "Connect event to broader corporate narrative and relationships",
+        "Create proper file structure following modular architecture",
+        "Update corporate registry with event information"
+      ],
+      "file_generation": [
+        "corporate/events/corporate-event-{event}.md",
+        "corporate/events/{event}/corporate-event-{event}-fred-involvement.md",
+        "corporate/events/{event}/corporate-event-{event}-political-implications.md"
+      ]
+    },
+    
+    "corporate_politics_development": {
+      "title_format": "Document {aspect} of Corporate Politics",
+      "description_format": "Create comprehensive documentation of {aspect} of Turd Bird corporate politics, including key factions, leadership struggles, alliance patterns, Fred's political maneuvers, and historical shifts. This documentation should provide insight into the power dynamics that drive company decision-making.",
+      "acceptance_criteria": [
+        "Document key political factions and their composition",
+        "Detail leadership struggles and succession dynamics",
+        "Describe alliance patterns and coalition formation",
+        "Explain Fred's political strategies and manipulations",
+        "Document The Board's involvement and influence",
+        "Identify historical political shifts and turning points",
+        "Detail how politics affects corporate decision-making",
+        "Connect political dynamics to character relationships",
+        "Create proper file structure following modular architecture",
+        "Update corporate registry with political information"
+      ],
+      "file_generation": [
+        "corporate/politics/corporate-politics-{aspect}.md",
+        "corporate/politics/{aspect}/corporate-politics-{aspect}-factions.md",
+        "corporate/politics/{aspect}/corporate-politics-{aspect}-fred-strategies.md"
+      ]
+    },
+    
+    "interdepartmental_conflict_development": {
+      "title_format": "Document Conflict Between {department1} and {department2} Departments",
+      "description_format": "Create detailed documentation of the conflict between {department1} and {department2} departments, including origins, key players, escalation patterns, operational impacts, and resolution attempts. This documentation should explore interdepartmental dynamics and their effect on Turd Bird Industries.",
+      "acceptance_criteria": [
+        "Document conflict origins and underlying causes",
+        "Detail key players on both sides and their motivations",
+        "Describe escalation patterns and significant incidents",
+        "Explain impact on company operations and projects",
+        "Document resolution attempts and their effectiveness",
+        "Identify Fred's involvement or position in the conflict",
+        "Detail how the conflict affects broader company politics",
+        "Connect conflict to character relationships and dynamics",
+        "Create proper file structure following modular architecture",
+        "Update corporate registry with conflict information"
+      ],
+      "file_generation": [
+        "corporate/departments/conflicts/corporate-conflict-{department1}-{department2}.md",
+        "corporate/departments/conflicts/corporate-conflict-{department1}-{department2}-incidents.md",
+        "corporate/departments/conflicts/corporate-conflict-{department1}-{department2}-resolution.md"
+      ]
+    }
+  }
+}

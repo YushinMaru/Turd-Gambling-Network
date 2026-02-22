@@ -1,0 +1,58 @@
+## Primary Character Directory Structure Template
+
+```
+/{character-name}/           # Kebab-case name (e.g., fred-turd)
+  /_profile/                 # Core identity documentation
+    character-{name}-overview-brief.md         # Essential character summary (<150 lines)
+    /attributes/
+      character-{name}-attributes-physical.md   # Physical attributes and presentation
+      character-{name}-attributes-personality.md # Psychological makeup and behavioral patterns
+    /function/
+      character-{name}-function-narrative.md    # Role within the universe structure
+    /development/
+      character-{name}-development-arc.md       # Character evolution summary
+  
+  /origins/                  # Character backstory and formation
+    character-{name}-childhood.md        # Early formative experiences
+    character-{name}-education.md        # Academic and intellectual development
+    character-{name}-early-career.md     # Initial professional development
+    /phases/
+      character-{name}-origins-phase-early.md   # Detailed early phase development
+      character-{name}-origins-phase-middle.md  # Detailed middle phase development
+    /psychology/
+      character-{name}-origins-psychology.md    # Psychological development
+    /incidents/
+      character-{name}-origins-incident-{descriptor}.md # Notable formative incidents
+  
+  /development/              # Character evolution over time
+    character-{name}-pivotal-events.md   # Transformative experiences
+    character-{name}-arc-{descriptor}.md # Specific developmental trajectories
+    character-{name}-evolution-{trait}.md # How specific traits changed over time
+  
+  /relationships/            # Interpersonal dynamics
+    relationship-{name}-{other}-{type}.md # Individual relationship documentation
+    relationship-{name}-network-overview.md # Complete relationship ecosystem
+  
+  /capabilities/             # Notable abilities and skills
+    character-{name}-skills-{category}.md # Domain-specific abilities
+    character-{name}-expertise-{area}.md  # Areas of unusual competence
+    character-{name}-methods-{approach}.md # Distinctive methodologies
+  
+  /states/                   # Temporal character snapshots
+    character-{name}-state-{year}.md     # Character state at specific time points
+    character-{name}-state-{event}.md    # Character state relative to events
+  
+  /expressions/              # Character voice and communication
+    character-{name}-quotes-{theme}.md   # Thematically organized quotations
+    character-{name}-philosophy-{topic}.md # Character beliefs and worldview
+    character-{name}-communication-style.md # Speaking patterns and methods
+  
+  /possessions/              # Significant items and environments
+    character-{name}-signature-items.md  # Iconic possessions
+    character-{name}-residence-{location}.md # Living/working environments
+    character-{name}-technology-{category}.md # Technology associated with character
+  
+  /impact/                   # Narrative influence
+    character-{name}-legacy-{area}.md    # Long-term influence on universe
+    character-{name}-influence-{domain}.md # Specific areas of narrative impact
+```

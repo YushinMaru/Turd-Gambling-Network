@@ -1,0 +1,61 @@
+# {{CHARACTER_NAME}} - Personality Attributes
+**Edition #1.0.0 | Created: ({{CREATOR_ID}}) | Last Modified: ({{CREATOR_ID}})**
+
+> Previous: None (Initial Documentation)
+
+> **⚠️ FILE SIZE LIMITATION: DO NOT CREATE ANY MORE LINES IN THIS DOCUMENT UNLESS NECESSARY.**
+> **ANY NEW LARGE ADDITIONS SHOULD FOLLOW REFACTORING AFTER 150 LINES.**
+
+## Context
+This document details the psychological characteristics, behavioral patterns, and personality traits of {{CHARACTER_NAME}}. These elements define the character's unique identity, decision-making processes, and interpersonal dynamics within the Turd Bird Universe.
+
+## Personality Profile
+
+### Core Traits
+- [Primary trait 1]
+- [Primary trait 2]
+- [Primary trait 3]
+- [Primary trait 4]
+- [Primary trait 5]
+
+### Psychological Motivations
+- Primary Drives: [What fundamentally motivates this character]
+- Core Values: [What the character prioritizes and values]
+- Fears and Anxieties: [What the character fears]
+- Aspirations: [What the character hopes to achieve]
+
+### Behavioral Patterns
+- Communication Style: [How the character typically communicates]
+- Decision-Making Process: [How the character makes decisions]
+- Conflict Resolution Approach: [How the character handles conflict]
+- Stress Response: [How the character reacts under pressure]
+- Adaptation Mechanisms: [How the character adapts to change]
+
+### Interpersonal Dynamics
+- Leadership Style: [If applicable]
+- Group Role: [Typical role in group settings]
+- Relationship Patterns: [How they tend to relate to others]
+- Trust Dynamics: [How they establish and maintain trust]
+- Power Dynamics: [How they interact with authority/power]
+
+### Cognitive Patterns
+- Thought Process: [Characteristic thinking patterns]
+- Problem-Solving Approach: [How they tackle challenges]
+- Learning Style: [How they acquire new information]
+- Perception Biases: [Systematic perceptual tendencies]
+- Belief Systems: [Core ideological frameworks]
+
+## Distinctive Characteristics
+[Any unique or unusual psychological traits that define this character]
+
+## Personality Evolution
+[Brief notes on how personality has evolved over time, with references to detailed documents]
+
+## References
+- [/_profile/character-{{CHARACTER_KEBAB}}-overview-brief.md § CORE-IDENTITY]
+- [/expressions/character-{{CHARACTER_KEBAB}}-quotes.md § PERSONALITY-INDICATORS]
+- [/development/character-{{CHARACTER_KEBAB}}-arc-primary.md § PSYCHOLOGICAL-EVOLUTION]
+
+## Version History
+### v1.0.0 - {{CREATED_DATE}}
+- Initial documentation created via directory template generator

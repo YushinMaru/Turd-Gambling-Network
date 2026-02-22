@@ -92,6 +92,35 @@ class TurdCasinoBot(commands.Bot):
         
         logger.info("[SETUP] Setup complete!")
     
+    async def post_admin_panel(self):
+        """Post admin panel to admin channel for each guild"""
+        for guild in self.guilds:
+            try:
+                await self.channel_manager.setup_channels(guild)
+                admin_channel = self.channel_manager.get_admin_channel(guild.id)
+                
+                if admin_channel:
+                    # Purge and post
+                    try:
+                        await admin_channel.purge(check=lambda m: True)
+                    except:
+                        pass
+                    
+                    # Build admin panel
+                    embed = discord.Embed(
+                        title="🛡️ Turd Casino Admin Panel",
+                        description="Manage bets and resolve disputes",
+                        color=0xF39C12
+                    )
+                    
+                    from dashboard_views import AdminBetResolveView
+                    view = AdminBetResolveView(self, self.db, self.channel_manager)
+                    
+                    await admin_channel.send(embed=embed, view=view)
+                    logger.info(f"[ADMIN] Posted admin panel to {guild.name}")
+            except Exception as e:
+                logger.error(f"[ADMIN] Error posting admin panel: {e}")
+    
     async def on_ready(self):
         """Bot ready"""
         logger.info(f"[BOT] Turd Casino is ready: {self.user}")
@@ -102,8 +131,41 @@ class TurdCasinoBot(commands.Bot):
             logger.info(f"[BOT] Setting up channels for server: {guild.name}")
             await self.channel_manager.setup_channels(guild)
         
-        # Post initial dashboard
-        await self.post_dashboard()
+        # Post initial dashboard to all channels (not just once)
+        if not hasattr(self, '_dashboard_posted') or not self._dashboard_posted:
+            self._dashboard_posted = True
+            await self.post_dashboard_for_all_guilds()
+            await self.post_admin_panel()
+    
+    async def post_dashboard_for_all_guilds(self):
+        """Post dashboard to each guild's gambling channel"""
+        logger.info(f"[DASHBOARD] Starting dashboard post for {len(self.guilds)} guilds")
+        
+        for guild in self.guilds:
+            logger.info(f"[DASHBOARD] Processing guild: {guild.name} (id: {guild.id})")
+            try:
+                # Set up channels for this guild to get the right channel
+                await self.channel_manager.setup_channels(guild)
+                channel = self.channel_manager.get_gambling_channel(guild.id)
+                
+                logger.info(f"[DASHBOARD] Channel for {guild.name}: {channel}")
+                
+                if channel:
+                    logger.info(f"[DASHBOARD] Found channel #{channel.name} in {guild.name}")
+                    
+                    # Purge and post
+                    try:
+                        await channel.purge(check=lambda m: True)
+                    except Exception as e:
+                        logger.warning(f"[DASHBOARD] Could not purge {channel.name}: {e}")
+                    
+                    embed = self.dashboard_builder.build_dashboard(guild)
+                    sent_msg = await channel.send(embed=embed, view=self.dashboard_view)
+                    logger.info(f"[DASHBOARD] Posted message {sent_msg.id} to #{channel.name} in {guild.name} (channel id: {channel.id})")
+                else:
+                    logger.warning(f"[DASHBOARD] No gambling channel found for {guild.name}")
+            except Exception as e:
+                logger.error(f"[DASHBOARD] Error posting to {guild.name}: {e}", exc_info=True)
     
     async def on_guild_join(self, guild: discord.Guild):
         """Called when the bot joins a new server"""
@@ -143,11 +205,11 @@ class TurdCasinoBot(commands.Bot):
         except Exception as e:
             logger.error(f"[DASHBOARD] Error posting dashboard: {e}")
     
-    @tasks.loop(minutes=10)
+    @tasks.loop(seconds=60)
     async def dashboard_refresh(self):
-        """Refresh dashboard periodically"""
+        """Refresh dashboard periodically for all guilds"""
         try:
-            await self.post_dashboard()
+            await self.post_dashboard_for_all_guilds()
         except Exception as e:
             logger.error(f"[DASHBOARD] Refresh error: {e}")
     
@@ -170,6 +232,27 @@ class TurdCasinoBot(commands.Bot):
         
         # Process commands
         await self.process_commands(message)
+    
+    @commands.command(name="dashboard")
+    async def dashboard_cmd(self, ctx):
+        """Force refresh the dashboard"""
+        if not ctx.guild:
+            await ctx.send("This command must be used in a server!")
+            return
+        
+        channel = self.channel_manager.get_gambling_channel(ctx.guild.id)
+        if not channel:
+            await ctx.send("Gambling channel not found!")
+            return
+        
+        try:
+            await channel.purge(check=lambda m: True)
+        except:
+            pass
+        
+        embed = self.dashboard_builder.build_dashboard(ctx.guild)
+        await channel.send(embed=embed, view=self.dashboard_view)
+        await ctx.send("✅ Dashboard refreshed!")
 
 
 # ============== MAIN ==============

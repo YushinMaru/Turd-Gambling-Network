@@ -1,0 +1,28 @@
+## Secondary Character Directory Structure Template
+
+```
+/{character-name}/           # Kebab-case name (e.g., augusta-turing)
+  /_profile/                 # Core identity documentation
+    character-{name}-overview.md         # Essential character summary (<150 lines)
+    character-{name}-appearance.md       # Physical attributes and presentation
+    character-{name}-personality.md      # Psychological makeup and behavioral patterns
+  
+  /origins/                  # Condensed backstory
+    character-{name}-background.md       # Consolidated origin information
+  
+  /development/              # Key evolutionary points
+    character-{name}-arc-{descriptor}.md # Primary developmental trajectory
+  
+  /relationships/            # Primary relationships only
+    relationship-{name}-{other}-{type}.md # Documentation for significant relationships
+  
+  /capabilities/             # Notable abilities
+    character-{name}-skills-overview.md  # Consolidated skills documentation
+  
+  /states/                   # Fewer temporal snapshots
+    character-{name}-state-current.md    # Current character state
+    character-{name}-state-origin.md     # Original introduction state
+  
+  /expressions/              # Character voice
+    character-{name}-quotes.md           # Consolidated quotations
+```
