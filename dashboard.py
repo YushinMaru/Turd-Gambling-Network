@@ -189,3 +189,82 @@ class DashboardBuilder:
         )
         
         return embed
+    
+    def build_user_analytics(self, user_id: str) -> discord.Embed:
+        """Build detailed user analytics"""
+        user = self.db.get_user(user_id)
+        
+        if not user:
+            embed = discord.Embed(
+                title="📊 Your Analytics",
+                description="No data available yet.",
+                color=EMBED_COLOR
+            )
+            return embed
+        
+        # Get user's bets
+        bets = self.bet_manager.get_user_bets(user_id)
+        
+        total_bets = len(bets)
+        resolved_bets = [b for b in bets if b['status'] == 'resolved']
+        wins = sum(1 for b in resolved_bets if b['winner_id'] == user_id)
+        losses = len(resolved_bets) - wins
+        
+        win_rate = (wins / len(resolved_bets) * 100) if resolved_bets else 0
+        
+        # Get category breakdown
+        conn = self.db.get_connection()
+        c = conn.cursor()
+        c.execute('''SELECT b.category, COUNT(*) as count, SUM(b.amount) as total
+                    FROM bets b
+                    JOIN bet_participants bp ON b.bet_id = bp.bet_id
+                    WHERE bp.user_id = ? AND b.status = 'resolved'
+                    GROUP BY b.category''', (user_id,))
+        category_rows = c.fetchall()
+        
+        c.execute('''SELECT b.bet_type, COUNT(*) as count
+                    FROM bets b
+                    JOIN bet_participants bp ON b.bet_id = bp.bet_id
+                    WHERE bp.user_id = ? AND b.status = 'resolved'
+                    GROUP BY b.bet_type''', (user_id,))
+        type_rows = c.fetchall()
+        conn.close()
+        
+        embed = discord.Embed(
+            title=f"📊 Analytics for {user['display_name'] or user['username']}",
+            color=EMBED_COLOR
+        )
+        
+        # Overview
+        embed.add_field(
+            name="📈 Overview",
+            value=f"**Total Bets:** {total_bets}\n"
+                  f"**Resolved:** {len(resolved_bets)}\n"
+                  f"**Wins:** {wins}\n"
+                  f"**Losses:** {losses}\n"
+                  f"**Win Rate:** {win_rate:.1f}%",
+            inline=True
+        )
+        
+        # Money
+        embed.add_field(
+            name="💰 Money",
+            value=f"**Current Balance:** {user['balance']:,} TC\n"
+                  f"**Total Won:** {user['total_won']:,} TC\n"
+                  f"**Total Lost:** {user['total_lost']:,} TC\n"
+                  f"**Net Profit:** {user['total_won'] - user['total_lost']:,} TC",
+            inline=True
+        )
+        
+        # Categories
+        if category_rows:
+            cat_text = "\n".join([f"{cat or 'Random'}: {count} ({total:,} TC)" 
+                                  for cat, count, total in category_rows])
+            embed.add_field(name="🎯 By Category", value=cat_text, inline=False)
+        
+        # Bet types
+        if type_rows:
+            type_text = "\n".join([f"{bt}: {count}" for bt, count in type_rows])
+            embed.add_field(name="🎲 By Type", value=type_text, inline=True)
+        
+        return embed
