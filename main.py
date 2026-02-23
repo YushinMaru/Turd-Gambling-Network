@@ -89,6 +89,7 @@ class TurdCasinoBot(commands.Bot):
         
         # Start background tasks
         self.dashboard_refresh.start()
+        self.check_scheduled_verifications.start()
         
         logger.info("[SETUP] Setup complete!")
     
@@ -217,6 +218,102 @@ class TurdCasinoBot(commands.Bot):
     async def before_dashboard_refresh(self):
         """Wait for bot to be ready"""
         await self.wait_until_ready()
+    
+    @tasks.loop(minutes=5)
+    async def check_scheduled_verifications(self):
+        """Check for scheduled bets that need verification"""
+        try:
+            await self._check_scheduled_bets()
+        except Exception as e:
+            logger.error(f"[SCHEDULED] Error checking scheduled bets: {e}")
+    
+    @check_scheduled_verifications.before_loop
+    async def before_scheduled_check(self):
+        """Wait for bot to be ready"""
+        await self.wait_until_ready()
+    
+    async def _check_scheduled_bets(self):
+        """Check and process scheduled bets"""
+        from datetime import datetime
+        
+        conn = self.db.get_connection()
+        c = conn.cursor()
+        
+        # Get pending bets with scheduled verification dates
+        c.execute('''SELECT bet_id, bet_topic, verification_type, verification_date, verification_url, verification_claim
+                    FROM bets 
+                    WHERE status = 'pending' 
+                    AND (verification_type = 'scheduled' OR verification_type = 'ai')
+                    AND verification_date IS NOT NULL''')
+        
+        bets = c.fetchall()
+        conn.close()
+        
+        now = datetime.now()
+        
+        for bet in bets:
+            bet_id, topic, verif_type, verif_date, verif_url, verif_claim = bet
+            
+            if not verif_date:
+                continue
+            
+            try:
+                # Parse the verification date
+                scheduled_dt = datetime.strptime(verif_date, '%Y-%m-%d %H:%M')
+                
+                if now >= scheduled_dt:
+                    logger.info(f"[SCHEDULED] Processing bet {bet_id} - verification time reached")
+                    
+                    if verif_type == 'ai' and verif_url and verif_claim:
+                        # Run AI verification
+                        from verification import verify_bet
+                        
+                        success, result = await verify_bet(bet_id, verif_url, verif_claim, self.db)
+                        
+                        if success and '|' in result:
+                            result_type, explanation = result.split('|')
+                            
+                            # Get participants to determine winner
+                            participants = self.db.get_bet_participants(bet_id)
+                            
+                            if result_type == "WIN_A" and len(participants) >= 1:
+                                winner_id = participants[0]['user_id']
+                            elif result_type == "WIN_B" and len(participants) >= 2:
+                                winner_id = participants[1]['user_id']
+                            else:
+                                winner_id = None
+                            
+                            if winner_id:
+                                # Resolve the bet
+                                self.bet_manager.resolve_bet(bet_id, winner_id)
+                                logger.info(f"[SCHEDULED] Bet {bet_id} resolved via AI - winner: {winner_id}")
+                            else:
+                                logger.warning(f"[SCHEDULED] Could not determine winner for {bet_id}")
+                        else:
+                            logger.warning(f"[SCHEDULED] AI verification failed for {bet_id}: {result}")
+                    
+                    elif verif_type == 'scheduled':
+                        # Ping participants to resolve
+                        participants = self.db.get_bet_participants(bet_id)
+                        
+                        for p in participants:
+                            user = await self.fetch_user(p['user_id'])
+                            if user:
+                                # Try to DM user
+                                try:
+                                    embed = discord.Embed(
+                                        title="⏰ Time to Resolve Your Bet!",
+                                        description=f"Your bet is ready for resolution:\n\n**{topic}**\n\nPlease click 'I Win' or 'I Lose' in the bet thread.",
+                                        color=0xF39C12
+                                    )
+                                    await user.send(embed=embed)
+                                except:
+                                    pass  # Can't DM
+                        
+                        logger.info(f"[SCHEDULED] Sent resolution reminders for {bet_id}")
+                        
+            except Exception as e:
+                logger.error(f"[SCHEDULED] Error processing bet {bet_id}: {e}")
     
     async def on_message(self, message):
         """Handle messages"""
