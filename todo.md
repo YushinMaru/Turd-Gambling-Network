@@ -336,36 +336,39 @@ Extra features to enhance the betting experience.
 Users enter predictions before bet is made, winner determined by closest prediction.
 
 ### 6.1 Database Updates
-- [ ] Add prediction_a field to bets table
-- [ ] Add prediction_b field to bets table
-- [ ] Add prediction_actual field for actual result
-- [ ] Add "prediction" to verification_type options
-- [ ] Syntax check database files
+- [x] Add prediction_a field to bets table
+- [x] Add prediction_b field to bets table
+- [x] Add prediction_actual field for actual result
+- [x] Add "prediction" to verification_type options
+- [x] Syntax check database files
 
 ### 6.2 Bet Creation Flow
-- [ ] Add "Prediction" option to verification dropdown
-- [ ] Update modal to ask for predictions from both users
-- [ ] Both users must enter prediction before bet is finalized
-- [ ] Syntax check dashboard_views.py
+- [x] Add "Prediction" option to verification dropdown
+- [x] Update modal to ask for predictions from both users
+- [x] Both users must enter prediction before bet is finalized
+- [x] Syntax check dashboard_views.py
 
 ### 6.3 Prediction Entry in Thread
-- [ ] Add "Enter Prediction" button for both participants
-- [ ] Modal for entering numeric/text prediction
-- [ ] Store prediction in database
-- [ ] Show predictions in thread embed
+- [x] Add "Enter Prediction" button for both participants
+- [x] Modal for entering numeric/text prediction
+- [x] Store prediction in database
+- [x] Show predictions in thread embed
+- [x] Add "Set Actual Result" button
 
 ### 6.4 Resolution Logic
-- [ ] At resolution, compare actual result to predictions
-- [ ] Winner = user with closest prediction (for numeric)
-- [ ] Winner = exact match (for text)
-- [ ] Handle tie-breaking
-- [ ] Update verification.py with prediction comparison
+- [x] At resolution, compare actual result to predictions
+- [x] Winner = user with closest prediction (for numeric)
+- [x] Winner = exact match (for text)
+- [x] Handle tie-breaking
+- [x] Update verification.py with prediction comparison
 
 ### 6.5 Testing
-- [ ] Test prediction entry flow
-- [ ] Test numeric comparison (closest wins)
-- [ ] Test exact match comparison
-- [ ] Test tie scenarios
+- [x] Test prediction entry flow
+- [x] Test numeric comparison (closest wins)
+- [x] Test exact match comparison
+- [x] Test tie scenarios
+
+> ✅ **CHECKPOINT**: Prediction Verification System complete!
 
 ---
 
