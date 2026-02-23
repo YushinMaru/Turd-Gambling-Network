@@ -204,20 +204,20 @@ class DatabaseManager:
             conn.close()
             return False
     
-    def join_bet(self, bet_id: str, user_id: str) -> bool:
+    def join_bet(self, bet_id: str, user_id: str, side: str = 'B') -> bool:
         """Join an existing bet"""
         conn = self.get_connection()
         c = conn.cursor()
         
         try:
-            c.execute("SELECT amount, status FROM bets WHERE bet_id = ?", (bet_id,))
+            c.execute("SELECT amount, status, bet_type FROM bets WHERE bet_id = ?", (bet_id,))
             row = c.fetchone()
             
             if not row:
                 conn.close()
                 return False
             
-            amount, status = row[0], row[1]
+            amount, status, bet_type = row[0], row[1], row[2]
             
             if status != 'open':
                 conn.close()
@@ -228,12 +228,44 @@ class DatabaseManager:
                 conn.close()
                 return False
             
-            c.execute('''INSERT INTO bet_participants (bet_id, user_id, side) VALUES (?, ?, 'B')''',
-                     (bet_id, user_id))
+            # Determine side based on bet type
+            if bet_type == '1v1':
+                # Check if there's already someone on side B
+                c.execute("SELECT user_id FROM bet_participants WHERE bet_id = ? AND side = 'B'", (bet_id,))
+                if c.fetchone():
+                    conn.close()
+                    return False  # Side B already taken for 1v1
+                target_side = 'B'
+            elif bet_type == '1vMany':
+                # Joiner always goes to side B
+                target_side = 'B'
+            elif bet_type == 'ManyvMany':
+                # Determine side based on team assignment
+                target_side = side
+            else:
+                target_side = side
+            
+            c.execute('''INSERT INTO bet_participants (bet_id, user_id, side) VALUES (?, ?, ?)''',
+                     (bet_id, user_id, target_side))
             
             c.execute("UPDATE users SET balance = balance - ? WHERE user_id = ?", (amount, user_id))
             
-            c.execute("UPDATE bets SET status = 'pending' WHERE bet_id = ?", (bet_id,))
+            # Check if bet is now ready
+            c.execute("SELECT COUNT(*) FROM bet_participants WHERE bet_id = ?", (bet_id,))
+            participant_count = c.fetchone()[0]
+            
+            if bet_type == '1v1' and participant_count >= 2:
+                c.execute("UPDATE bets SET status = 'pending' WHERE bet_id = ?", (bet_id,))
+            elif bet_type == '1vMany' and participant_count >= 2:
+                c.execute("UPDATE bets SET status = 'pending' WHERE bet_id = ?", (bet_id,))
+            elif bet_type == 'ManyvMany':
+                # Check if both teams have at least 1 person
+                c.execute("SELECT side, COUNT(*) FROM bet_participants WHERE bet_id = ? GROUP BY side", (bet_id,))
+                side_counts = c.fetchall()
+                has_a = any(s == 'A' for s, _ in side_counts)
+                has_b = any(s == 'B' for s, _ in side_counts)
+                if has_a and has_b:
+                    c.execute("UPDATE bets SET status = 'pending' WHERE bet_id = ?", (bet_id,))
             
             conn.commit()
             conn.close()

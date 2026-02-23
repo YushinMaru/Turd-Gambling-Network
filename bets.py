@@ -182,3 +182,38 @@ class BetManager:
     def get_user_bets(self, user_id: str) -> List[Dict]:
         """Get all bets for a user"""
         return self.db.get_user_bets(user_id)
+    
+    def create_bet_advanced(self, creator_id: str, bet_topic: str, amount: int, bet_description: str = None,
+                            bet_type: str = '1v1', category: str = 'Random', odds: str = 'even',
+                            visibility: str = 'open', expiration: str = '7d', verification_type: str = 'manual',
+                            verification_url: str = None, verification_claim: str = None, verification_date: str = None) -> tuple[bool, str, Optional[str]]:
+        """Create a new bet with advanced options"""
+        # Validate amount
+        valid, message = self.currency.validate_bet_amount(amount)
+        if not valid:
+            return False, message, None
+        
+        # Check if creator can afford
+        if not self.currency.can_afford(creator_id, amount):
+            balance = self.currency.get_balance(creator_id)
+            return False, f"Insufficient balance. You have {balance:,} Turd Coins.", None
+        
+        # Generate bet ID
+        bet_id = self.generate_bet_id()
+        
+        # Create bet
+        success = self.db.create_bet_advanced(
+            bet_id, creator_id, bet_topic, amount, bet_description,
+            bet_type=bet_type, category=category, odds=odds,
+            visibility=visibility, expiration=expiration,
+            verification_type=verification_type,
+            verification_url=verification_url,
+            verification_claim=verification_claim,
+            verification_date=verification_date
+        )
+        
+        if success:
+            logger.info(f"Advanced bet created: {bet_id} by {creator_id} for {amount} ({bet_type})")
+            return True, f"✅ Bet created! Bet ID: `{bet_id}`", bet_id
+        else:
+            return False, "❌ Failed to create bet. Please try again.", None
