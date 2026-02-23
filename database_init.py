@@ -199,7 +199,11 @@ class DatabaseInitializer:
                 'verification_date': "ALTER TABLE bets ADD COLUMN verification_date TEXT",
                 'pending_confirmation': "ALTER TABLE bets ADD COLUMN pending_confirmation INTEGER DEFAULT 0",
                 'first_responder_id': "ALTER TABLE bets ADD COLUMN first_responder_id TEXT",
-                'first_response': "ALTER TABLE bets ADD COLUMN first_response TEXT"
+                'first_response': "ALTER TABLE bets ADD COLUMN first_response TEXT",
+                # Prediction verification fields
+                'prediction_a': "ALTER TABLE bets ADD COLUMN prediction_a TEXT",
+                'prediction_b': "ALTER TABLE bets ADD COLUMN prediction_b TEXT",
+                'prediction_actual': "ALTER TABLE bets ADD COLUMN prediction_actual TEXT"
             }
             
             for col, sql in migrations.items():

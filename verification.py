@@ -155,3 +155,91 @@ def clear_cache():
     global _url_cache
     _url_cache.clear()
     logger.info("[VERIFICATION] Cache cleared")
+
+
+def compare_predictions(prediction_a: str, prediction_b: str, actual: str) -> Tuple[str, str]:
+    """
+    Compare predictions against actual result.
+    
+    Returns: (result, explanation)
+    - result: "WIN_A", "WIN_B", "TIE", "UNCLEAR"
+    - explanation: Human-readable explanation
+    """
+    if not prediction_a or not prediction_b or not actual:
+        return "UNCLEAR", "Missing prediction or actual result"
+    
+    # Try numeric comparison first
+    try:
+        pred_a_num = float(prediction_a)
+        pred_b_num = float(prediction_b)
+        actual_num = float(actual)
+        
+        # Calculate distances
+        dist_a = abs(pred_a_num - actual_num)
+        dist_b = abs(pred_b_num - actual_num)
+        
+        if dist_a < dist_b:
+            return "WIN_A", f"Prediction A ({pred_a_num}) is closer to actual ({actual_num})"
+        elif dist_b < dist_a:
+            return "WIN_B", f"Prediction B ({pred_b_num}) is closer to actual ({actual_num})"
+        else:
+            return "TIE", f"Both predictions are equally close to actual ({actual_num})"
+    
+    except ValueError:
+        # Not numeric - do text comparison
+        actual_lower = actual.lower()
+        pred_a_lower = prediction_a.lower()
+        pred_b_lower = prediction_b.lower()
+        
+        a_matches = pred_a_lower == actual_lower
+        b_matches = pred_b_lower == actual_lower
+        
+        if a_matches and b_matches:
+            return "TIE", "Both predictions match exactly"
+        elif a_matches:
+            return "WIN_A", f"Prediction A matches: '{prediction_a}'"
+        elif b_matches:
+            return "WIN_B", f"Prediction B matches: '{prediction_b}'"
+        else:
+            return "UNCLEAR", f"Neither prediction matches. Actual: '{actual}'"
+
+
+async def verify_prediction(bet_id: str, db) -> Tuple[bool, str]:
+    """
+    Verify a bet using prediction comparison.
+    
+    Returns: (success, result_message)
+    """
+    logger.info(f"[PREDICTION] Starting prediction verification for bet {bet_id}")
+    
+    # Get bet data
+    conn = db.get_connection()
+    c = conn.cursor()
+    c.execute('''SELECT prediction_a, prediction_b, prediction_actual FROM bets WHERE bet_id = ?''', (bet_id,))
+    row = c.fetchone()
+    conn.close()
+    
+    if not row:
+        return False, "Bet not found"
+    
+    prediction_a, prediction_b, actual = row
+    
+    if not prediction_a or not prediction_b:
+        return False, "Predictions not yet entered by both parties"
+    
+    if not actual:
+        return False, "Actual result not yet set"
+    
+    # Compare predictions
+    result, explanation = compare_predictions(prediction_a, prediction_b, actual)
+    
+    logger.info(f"[PREDICTION] Result for {bet_id}: {result} - {explanation}")
+    
+    if result == "UNCLEAR":
+        return False, f"Could not verify: {explanation}"
+    
+    if result == "TIE":
+        return False, f"Tie result: {explanation}"
+    
+    # Return result for resolution
+    return True, f"{result}|{explanation}"

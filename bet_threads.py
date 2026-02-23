@@ -435,6 +435,201 @@ class VoteButton(ui.Button):
         )
 
 
+class EnterPredictionButton(ui.Button):
+    """Button to enter prediction for prediction verification"""
+    
+    def __init__(self, bet_id: str):
+        super().__init__(
+            label="🎯 Enter Prediction",
+            style=discord.ButtonStyle.primary,
+            custom_id=f"bet_prediction_{bet_id}"
+        )
+        self.bet_id = bet_id
+    
+    async def callback(self, interaction: discord.Interaction):
+        user_id = str(interaction.user.id)
+        
+        # Get bot and db
+        bot = interaction.client
+        db = bot.db
+        
+        # Get bet info
+        bet = db.get_bet(self.bet_id)
+        
+        if not bet:
+            await interaction.response.send_message("❌ Bet not found.", ephemeral=True)
+            return
+        
+        # Check if this is a prediction verification type
+        if bet.get('verification_type') != 'prediction':
+            await interaction.response.send_message(
+                "❌ Predictions are only for Prediction verification bets.",
+                ephemeral=True
+            )
+            return
+        
+        # Get user's side
+        participants = db.get_bet_participants(self.bet_id)
+        user_side = None
+        for p in participants:
+            if p['user_id'] == user_id:
+                user_side = p['side']
+                break
+        
+        if not user_side:
+            await interaction.response.send_message("❌ You are not in this bet.", ephemeral=True)
+            return
+        
+        # Show prediction modal
+        modal = PredictionModal(self.bet_id, user_side)
+        await interaction.response.send_modal(modal)
+
+
+class SetActualButton(ui.Button):
+    """Button to set the actual result for prediction verification"""
+    
+    def __init__(self, bet_id: str):
+        super().__init__(
+            label="🎯 Set Actual Result",
+            style=discord.ButtonStyle.success,
+            custom_id=f"bet_actual_{bet_id}"
+        )
+        self.bet_id = bet_id
+    
+    async def callback(self, interaction: discord.Interaction):
+        user_id = str(interaction.user.id)
+        
+        # Get bot and db
+        bot = interaction.client
+        db = bot.db
+        
+        # Get bet info
+        bet = db.get_bet(self.bet_id)
+        
+        if not bet:
+            await interaction.response.send_message("❌ Bet not found.", ephemeral=True)
+            return
+        
+        # Check if this is a prediction verification type
+        if bet.get('verification_type') != 'prediction':
+            await interaction.response.send_message(
+                "❌ This is not a prediction bet.",
+                ephemeral=True
+            )
+            return
+        
+        # Show modal to enter actual result
+        modal = SetActualModal(self.bet_id)
+        await interaction.response.send_modal(modal)
+
+
+class SetActualModal(ui.Modal):
+    """Modal to set actual result for prediction"""
+    
+    def __init__(self, bet_id: str):
+        super().__init__(title="🎯 Set Actual Result", timeout=300)
+        self.bet_id = bet_id
+        
+        self.actual_input = ui.TextInput(
+            label="Actual Result",
+            placeholder="Enter the actual number or result",
+            style=discord.TextStyle.short,
+            required=True,
+            max_length=100
+        )
+        self.add_item(self.actual_input)
+    
+    async def callback(self, interaction: discord.Interaction):
+        user_id = str(interaction.user.id)
+        actual = self.actual_input.value
+        
+        # Get bot and db
+        bot = interaction.client
+        db = bot.db
+        
+        # Store actual result
+        success = db.set_actual_result(self.bet_id, actual)
+        
+        if success:
+            # Get predictions
+            bet = db.get_bet(self.bet_id)
+            
+            # Compare predictions
+            from verification import compare_predictions
+            result, explanation = compare_predictions(
+                bet.get('prediction_a', ''),
+                bet.get('prediction_b', ''),
+                actual
+            )
+            
+            # Post to thread
+            thread = interaction.channel
+            embed = discord.Embed(
+                title="🎯 Actual Result Set!",
+                description=f"**Actual:** {actual}\n\n**Predictions:**\n"
+                           f"• Side A: {bet.get('prediction_a', 'Not set')}\n"
+                           f"• Side B: {bet.get('prediction_b', 'Not set')}\n\n"
+                           f"**Result:** {explanation}",
+                color=0x2ECC71
+            )
+            await thread.send(embed=embed)
+            
+            await interaction.response.send_message("✅ Actual result saved!", ephemeral=True)
+        else:
+            await interaction.response.send_message("❌ Failed to save result.", ephemeral=True)
+
+
+class PredictionModal(ui.Modal):
+    """Modal to enter prediction"""
+    
+    def __init__(self, bet_id: str, side: str):
+        super().__init__(title="🎯 Enter Your Prediction", timeout=300)
+        self.bet_id = bet_id
+        self.side = side
+        
+        self.prediction_input = ui.TextInput(
+            label="Your Prediction",
+            placeholder="Enter a number or text",
+            style=discord.TextStyle.short,
+            required=True,
+            max_length=100
+        )
+        self.add_item(self.prediction_input)
+    
+    async def callback(self, interaction: discord.Interaction):
+        user_id = str(interaction.user.id)
+        prediction = self.prediction_input.value
+        
+        # Get bot and db
+        bot = interaction.client
+        db = bot.db
+        
+        # Store prediction
+        success = db.set_prediction(self.bet_id, self.side, prediction)
+        
+        if success:
+            # Get participants to find user name
+            participants = db.get_bet_participants(self.bet_id)
+            user_name = interaction.user.display_name
+            for p in participants:
+                if p['user_id'] == user_id:
+                    user_name = p['display_name'] or p['username']
+                    break
+            
+            # Post to thread
+            thread = interaction.channel
+            embed = discord.Embed(
+                title="🎯 Prediction Entered!",
+                description=f"**{user_name}** predicted: **{prediction}**",
+                color=0x3498DB
+            )
+            await thread.send(embed=embed)
+            
+            await interaction.response.send_message("✅ Prediction saved!", ephemeral=True)
+        else:
+            await interaction.response.send_message("❌ Failed to save prediction.", ephemeral=True)
+
+
 class SubmitProofModal(ui.Modal):
     """Modal to submit proof URL"""
     
@@ -718,6 +913,11 @@ def create_bet_thread_view(bet_id: str, creator_id: str, joiner_id: str = None, 
     if verification_type == 'vote':
         view.add_item(VoteButton(bet_id))
         view.add_item(ResolveVoteButton(bet_id))
+    
+    # Add Enter Prediction button for prediction verification
+    if verification_type == 'prediction':
+        view.add_item(EnterPredictionButton(bet_id))
+        view.add_item(SetActualButton(bet_id))
     
     # Add resolution buttons
     view.add_item(IWinButton(bet_id))

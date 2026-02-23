@@ -43,6 +43,7 @@ class VerificationSelectView(View):
         self.add_item(VerificationButton("link", "🔗 Link Proof", "Either party submits proof"))
         self.add_item(VerificationButton("ai", "🤖 AI Verification", "Bot scrapes URL to verify"))
         self.add_item(VerificationButton("scheduled", "⏰ Scheduled", "Bot pings at date for resolution"))
+        self.add_item(VerificationButton("prediction", "🎯 Prediction", "Both predict, closest wins"))
     
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return True

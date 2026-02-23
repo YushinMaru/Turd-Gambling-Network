@@ -290,7 +290,8 @@ class DatabaseManager:
                     COALESCE(expiration, '7d') as expiration,
                     COALESCE(status, 'open') as status,
                     COALESCE(verification_type, 'manual') as verification_type,
-                    proof_url, scheduled_resolve_time, created_at, resolved_at, winner_id
+                    proof_url, scheduled_resolve_time, created_at, resolved_at, winner_id,
+                    prediction_a, prediction_b, prediction_actual
                     FROM bets WHERE bet_id = ?''', (bet_id,))
         row = c.fetchone()
         
@@ -312,7 +313,10 @@ class DatabaseManager:
                 'scheduled_resolve_time': row[13],
                 'created_at': row[14],
                 'resolved_at': row[15],
-                'winner_id': row[16]
+                'winner_id': row[16],
+                'prediction_a': row[17],
+                'prediction_b': row[18],
+                'prediction_actual': row[19]
             }
             conn.close()
             return result
@@ -600,3 +604,17 @@ class DatabaseManager:
         
         conn.close()
         return results
+    
+    # ============== PREDICTION VERIFICATION ==============
+    
+    def set_prediction(self, bet_id: str, side: str, prediction: str) -> bool:
+        """Set prediction for a side"""
+        if side == 'A':
+            return self.update_bet(bet_id, prediction_a=prediction)
+        elif side == 'B':
+            return self.update_bet(bet_id, prediction_b=prediction)
+        return False
+    
+    def set_actual_result(self, bet_id: str, actual: str) -> bool:
+        """Set the actual result for prediction verification"""
+        return self.update_bet(bet_id, prediction_actual=actual)
