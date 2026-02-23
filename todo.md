@@ -111,80 +111,80 @@ Multiple verification methods for bet resolution with dual-confirmation flow.
 ### 2.1 Verification Dropdown Options
 Add the following options to the verification method dropdown in the bet creation modal:
 - [x] 🤝 **Manual** - Both parties must agree on winner
-- [ ] 🗳️ **Vote** - Community votes to decide winner
-- [ ] 🔗 **Link Proof** - Either party submits proof, admin resolves
-- [ ] 🤖 **AI Verification** - Bot scrapes URL and verifies result
-- [ ] ⏰ **Scheduled** - Bot pings at specified date for resolution
+- [x] 🗳️ **Vote** - Community votes to decide winner
+- [x] 🔗 **Link Proof** - Either party submits proof, admin resolves
+- [x] 🤖 **AI Verification** - Bot scrapes URL and verifies result
+- [x] ⏰ **Scheduled** - Bot pings at specified date for resolution
 
 ### 2.2 Bet Creation Modal Updates
-- [ ] Add date/time field to bet creation modal for scheduled verification
-- [ ] Add URL field for AI verification (what to scrape)
-- [ ] Add expected result field for AI verification (what to check)
-- [ ] Update verification dropdown in dashboard_views.py
-- [ ] Syntax check dashboard_views.py
+- [x] Add date/time field to bet creation modal for scheduled verification
+- [x] Add URL field for AI verification (what to scrape)
+- [x] Add expected result field for AI verification (what to check)
+- [x] Update verification dropdown in dashboard_views.py
+- [x] Syntax check dashboard_views.py
 
 ### 2.3 Database Schema Updates
 Add new columns to the bets table:
-- [ ] `verification_url` - URL for AI verification to scrape
-- [ ] `verification_claim` - Expected result/claim to verify
-- [ ] `verification_date` - Date/time for scheduled verification
-- [ ] `pending_confirmation` - Boolean, true when waiting for second user
-- [ ] `first_responder_id` - User ID who first clicked win/lose
-- [ ] `first_response` - Which side they chose (A or B)
-- [ ] Update database.py with new fields
-- [ ] Syntax check database.py
+- [x] `verification_url` - URL for AI verification to scrape
+- [x] `verification_claim` - Expected result/claim to verify
+- [x] `verification_date` - Date/time for scheduled verification
+- [x] `pending_confirmation` - Boolean, true when waiting for second user
+- [x] `first_responder_id` - User ID who first clicked win/lose
+- [x] `first_response` - Which side they chose (A or B)
+- [x] Update database.py with new fields
+- [x] Syntax check database.py
 
 ### 2.4 Dual-Confirmation Resolution Flow (Manual & Link Proof)
 **IMPORTANT**: Bet must NOT resolve until BOTH parties agree or dispute is filed.
 
 Implementation in bet_threads.py:
-- [ ] Modify IWinButton callback to NOT immediately resolve
-- [ ] Store first responder's choice in database (pending_confirmation=true)
-- [ ] Send ping to second user: "User X claims they won. Please confirm or dispute."
-- [ ] Add ConfirmButton - second user agrees, bet resolves
-- [ ] Add DisputeButton - second user disputes, goes to admin
-- [ ] Update ILoseButton to work the same way
-- [ ] Bet stays in "pending_confirmation" until both agree or dispute
-- [ ] If first user changes mind before second responds, allow them to cancel their claim
-- [ ] Syntax check bet_threads.py
+- [x] Modify IWinButton callback to NOT immediately resolve
+- [x] Store first responder's choice in database (pending_confirmation=true)
+- [x] Send ping to second user: "User X claims they won. Please confirm or dispute."
+- [x] Add ConfirmButton - second user agrees, bet resolves
+- [x] Add DisputeButton - second user disputes, goes to admin
+- [x] Update ILoseButton to work the same way
+- [x] Bet stays in "pending_confirmation" until both agree or dispute
+- [x] If first user changes mind before second responds, allow them to cancel their claim
+- [x] Syntax check bet_threads.py
 
 ### 2.5 Submit Proof Button (Link Proof Verification)
 Add to bet thread for both users:
-- [ ] Create SubmitProofButton with custom_id pattern: `proof_{bet_id}_{user_id}`
-- [ ] Button label: "📎 Submit Proof"
-- [ ] Opens modal with TextInput for proof URL
-- [ ] Stores proof_url in database
-- [ ] Posts proof to bet thread
-- [ ] Both users can submit proof before resolution
-- [ ] Syntax check bet_threads.py
+- [x] Create SubmitProofButton with custom_id pattern: `proof_{bet_id}_{user_id}`
+- [x] Button label: "📎 Submit Proof"
+- [x] Opens modal with TextInput for proof URL
+- [x] Stores proof_url in database
+- [x] Posts proof to bet thread
+- [x] Both users can submit proof before resolution
+- [x] Syntax check bet_threads.py
 
 ### 2.6 Scheduled Verification System
-- [ ] Create background task in main.py to check scheduled bets
-- [ ] Run every 5 minutes to check for bets at verification time
-- [ ] At verification time, ping both users in thread: "Time to resolve! Click I Win/I Lose"
-- [ ] For Vote: Automatically start vote poll at verification time
-- [ ] For AI: Run verification check at this time
-- [ ] Syntax check main.py
+- [x] Create background task in main.py to check scheduled bets
+- [x] Run every 5 minutes to check for bets at verification time
+- [x] At verification time, ping both users in thread: "Time to resolve! Click I Win/I Lose"
+- [x] For Vote: Automatically start vote poll at verification time
+- [x] For AI: Run verification check at this time
+- [x] Syntax check main.py
 
 ### 2.7 Vote Verification System
-- [ ] Create VoteStartButton in bet_threads.py
-- [ ] Creates poll embed with reactions for each side
-- [ ] Allows all server members to vote
-- [ ] 24 hour vote timeout
-- [ ] Majority wins, tie goes to creator
-- [ ] Auto-resolves or flags for admin if unclear
-- [ ] Syntax check bet_threads.py
+- [x] Create VoteStartButton in bet_threads.py
+- [x] Creates poll embed with reactions for each side
+- [x] Allows all server members to vote
+- [x] 24 hour vote timeout
+- [x] Majority wins, tie goes to creator
+- [x] Auto-resolves or flags for admin if unclear
+- [x] Syntax check bet_threads.py
 
 ### 2.8 AI Verification System (URL Scraping)
 Create new module `verification.py`:
-- [ ] Create `scrape_url(url)` function using requests + beautifulsoup4
-- [ ] Create `verify_claim(content, claim)` function
-- [ ] Support numeric comparisons: >, <, >=, <=, ==, !=
-- [ ] Support text contains: "contains X"
-- [ ] Create verification result: WIN_A, WIN_B, UNCLEAR
-- [ ] If UNCLEAR, flag for admin review
-- [ ] Cache scraped data to avoid rate limits
-- [ ] Syntax check verification.py
+- [x] Create `scrape_url(url)` function using requests + beautifulsoup4
+- [x] Create `verify_claim(content, claim)` function
+- [x] Support numeric comparisons: >, <, >=, <=, ==, !=
+- [x] Support text contains: "contains X"
+- [x] Create verification result: WIN_A, WIN_B, UNCLEAR
+- [x] If UNCLEAR, flag for admin review
+- [x] Cache scraped data to avoid rate limits
+- [x] Syntax check verification.py
 
 ### 2.9 Admin Resolution Workflow
 - [ ] When dispute filed, post to #turd-admin
