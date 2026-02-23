@@ -41,7 +41,7 @@ class BetThreadView(View):
 
 
 class IWinButton(ui.Button):
-    """Button to claim victory"""
+    """Button to claim victory - implements dual confirmation"""
     
     def __init__(self, bet_id: str):
         super().__init__(
@@ -82,66 +82,109 @@ class IWinButton(ui.Button):
             )
             return
         
-        # Resolve bet with this user as winner
-        success, message = bet_manager.resolve_bet(self.bet_id, user_id)
+        # Get participants to find the other user
+        participants = db.get_bet_participants(self.bet_id)
+        other_user_id = None
+        other_user_side = None
+        for p in participants:
+            if p['user_id'] != user_id:
+                other_user_id = p['user_id']
+                other_user_side = p['side']
+                break
         
-        if success:
-            # Get full bet details including winner/loser info
-            participants = db.get_bet_participants(self.bet_id)
-            winner_user = await bot.fetch_user(user_id)
-            loser_user = None
+        # Check if there's already a pending confirmation (first response)
+        if bet.get('pending_confirmation') == 1 and bet.get('first_responder_id') == other_user_id:
+            # The other user already claimed - this user is confirming
+            # Resolve bet with this user as winner
+            success, message = bet_manager.resolve_bet(self.bet_id, user_id)
             
-            for p in participants:
-                if p['user_id'] != user_id:
-                    loser_user = await bot.fetch_user(p['user_id'])
-                    break
+            if success:
+                await self._resolve_and_post(bot, db, self.bet_id, user_id, channel_manager)
+                await interaction.response.send_message(f"✅ Bet resolved! You confirmed and won!", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+            return
+        
+        # First response - store it and ping the other user
+        if other_user_id:
+            # Store first response in database
+            db.update_bet(self.bet_id, 
+                         pending_confirmation=1, 
+                         first_responder_id=user_id, 
+                         first_response='win')
             
-            # Get updated bet info
-            bet = db.get_bet(self.bet_id)
+            # Get the other user
+            other_user = await bot.fetch_user(other_user_id)
             
-            # Get winner/loser balance changes
-            winner_new_balance = db.get_balance(user_id)
-            loser_new_balance = 0
-            if loser_user:
-                loser_new_balance = db.get_balance(loser_user.id)
+            # Send confirmation request to the other user in thread
+            thread = interaction.channel
+            confirm_embed = discord.Embed(
+                title="⏰ Confirmation Required",
+                description=f"**{interaction.user.display_name}** claims they won!\n\n{other_user.mention if other_user else 'The other participant'}, please confirm or dispute this claim.",
+                color=0xF39C12
+            )
+            confirm_embed.add_field(name="Action Needed", value="Click ✅ to confirm you lost, or ⚠️ to dispute", inline=False)
             
-            # Post detailed embed to archive
-            if channel_manager:
-                embed = discord.Embed(
-                    title=f"🏆 Bet Resolved - {self.bet_id}",
-                    description=f"✅ **Bet Complete!**",
-                    color=0x2ECC71
-                )
-                embed.add_field(name="📝 Topic", value=bet['bet_topic'], inline=False)
-                embed.add_field(name="💰 Wager Amount", value=f"**{bet['amount']:,}** Turd Coins", inline=True)
-                embed.add_field(name="👑 Winner", value=f"**{winner_user.display_name}**", inline=True)
-                embed.add_field(name="😢 Loser", value=f"**{loser_user.display_name if loser_user else 'N/A'}**", inline=True)
-                embed.add_field(name="💵 Winner New Balance", value=f"**{winner_new_balance:,}** TC", inline=True)
-                if loser_user:
-                    embed.add_field(name="💸 Loser New Balance", value=f"**{loser_new_balance:,}** TC", inline=True)
-                embed.add_field(name="⏰ Resolved At", value=f"<t:{int(datetime.now().timestamp())}:F>", inline=True)
-                embed.set_footer(text=f"Bet ID: {self.bet_id}")
-                
-                await channel_manager.post_to_archive(embed)
+            # Send to thread
+            await thread.send(embed=confirm_embed)
             
-            # Update the thread
+            await interaction.response.send_message(
+                f"⏰ Confirmation sent to the other participant! They must confirm or dispute your win claim.",
+                ephemeral=True
+            )
+        else:
+            # No other participant - resolve immediately
+            success, message = bet_manager.resolve_bet(self.bet_id, user_id)
+            
+            if success:
+                await self._resolve_and_post(bot, db, self.bet_id, user_id, channel_manager)
+                await interaction.response.send_message("✅ Bet resolved! You win!", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+    
+    async def _resolve_and_post(self, bot, db, bet_id, winner_id, channel_manager):
+        """Helper to resolve bet and post to archive"""
+        # Get full bet details including winner/loser info
+        participants = db.get_bet_participants(bet_id)
+        winner_user = await bot.fetch_user(winner_id)
+        loser_user = None
+        
+        for p in participants:
+            if p['user_id'] != winner_id:
+                loser_user = await bot.fetch_user(p['user_id'])
+                break
+        
+        # Get updated bet info
+        bet = db.get_bet(bet_id)
+        
+        # Get winner/loser balance changes
+        winner_new_balance = db.get_balance(winner_id)
+        loser_new_balance = 0
+        if loser_user:
+            loser_new_balance = db.get_balance(loser_user.id)
+        
+        # Post detailed embed to archive
+        if channel_manager:
             embed = discord.Embed(
-                title=f"✅ Bet Resolved",
-                description=f"**Winner:** {interaction.user.display_name}",
+                title=f"🏆 Bet Resolved - {bet_id}",
+                description=f"✅ **Bet Complete!**",
                 color=0x2ECC71
             )
+            embed.add_field(name="📝 Topic", value=bet['bet_topic'], inline=False)
+            embed.add_field(name="💰 Wager Amount", value=f"**{bet['amount']:,}** Turd Coins", inline=True)
+            embed.add_field(name="👑 Winner", value=f"**{winner_user.display_name}**", inline=True)
+            embed.add_field(name="😢 Loser", value=f"**{loser_user.display_name if loser_user else 'N/A'}**", inline=True)
+            embed.add_field(name="💵 Winner New Balance", value=f"**{winner_new_balance:,}** TC", inline=True)
+            if loser_user:
+                embed.add_field(name="💸 Loser New Balance", value=f"**{loser_new_balance:,}** TC", inline=True)
+            embed.add_field(name="⏰ Resolved At", value=f"<t:{int(datetime.now().timestamp())}:F>", inline=True)
+            embed.set_footer(text=f"Bet ID: {bet_id}")
             
-            # Disable buttons
-            for item in self.view.children:
-                item.disabled = True
-            
-            await interaction.response.edit_message(embed=embed, view=self.view)
-        else:
-            await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+            await channel_manager.post_to_archive(embed)
 
 
 class ILoseButton(ui.Button):
-    """Button to admit defeat"""
+    """Button to admit defeat - implements dual confirmation"""
     
     def __init__(self, bet_id: str):
         super().__init__(
@@ -179,67 +222,185 @@ class ILoseButton(ui.Button):
         participants = db.get_bet_participants(self.bet_id)
         
         # Find the other user (winner)
-        winner_id = None
+        other_user_id = None
         for p in participants:
             if p['user_id'] != user_id:
-                winner_id = p['user_id']
+                other_user_id = p['user_id']
                 break
         
-        if not winner_id:
+        if not other_user_id:
             await interaction.response.send_message(
                 "❌ Can't resolve - need both parties.",
                 ephemeral=True
             )
             return
         
-        # Resolve bet with the other user as winner
-        success, message = bet_manager.resolve_bet(self.bet_id, winner_id)
-        
-        if success:
-            # Get full bet details
-            participants = db.get_bet_participants(self.bet_id)
-            winner_user = await bot.fetch_user(winner_id)
-            loser_user = interaction.user  # The person who clicked "I Lose"
+        # Check if there's already a pending confirmation
+        if bet.get('pending_confirmation') == 1 and bet.get('first_responder_id') == other_user_id:
+            # The other user already claimed - this user is confirming they lost
+            # Resolve bet with the other user as winner
+            success, message = bet_manager.resolve_bet(self.bet_id, other_user_id)
             
-            bet = db.get_bet(self.bet_id)
-            
-            # Get balances
-            winner_new_balance = db.get_balance(winner_id)
-            loser_new_balance = db.get_balance(user_id)
-            
-            # Post detailed embed to archive
-            if channel_manager:
+            if success:
+                # Get full bet details
+                winner_user = await bot.fetch_user(other_user_id)
+                loser_user = interaction.user
+                
+                bet = db.get_bet(self.bet_id)
+                
+                # Get balances
+                winner_new_balance = db.get_balance(other_user_id)
+                loser_new_balance = db.get_balance(user_id)
+                
+                # Post detailed embed to archive
+                if channel_manager:
+                    embed = discord.Embed(
+                        title=f"🏆 Bet Resolved - {self.bet_id}",
+                        description=f"✅ **Bet Complete!**",
+                        color=0x2ECC71
+                    )
+                    embed.add_field(name="📝 Topic", value=bet['bet_topic'], inline=False)
+                    embed.add_field(name="💰 Wager Amount", value=f"**{bet['amount']:,}** Turd Coins", inline=True)
+                    embed.add_field(name="👑 Winner", value=f"**{winner_user.display_name}**", inline=True)
+                    embed.add_field(name="😢 Loser", value=f"**{loser_user.display_name}**", inline=True)
+                    embed.add_field(name="💵 Winner New Balance", value=f"**{winner_new_balance:,}** TC", inline=True)
+                    embed.add_field(name="💸 Loser New Balance", value=f"**{loser_new_balance:,}** TC", inline=True)
+                    embed.add_field(name="⏰ Resolved At", value=f"<t:{int(datetime.now().timestamp())}:F>", inline=True)
+                    embed.set_footer(text=f"Bet ID: {self.bet_id}")
+                    
+                    await channel_manager.post_to_archive(embed)
+                
+                # Update the thread
                 embed = discord.Embed(
-                    title=f"🏆 Bet Resolved - {self.bet_id}",
-                    description=f"✅ **Bet Complete!**",
+                    title=f"✅ Bet Resolved",
+                    description=f"**Winner:** {winner_user.display_name if winner_user else 'Unknown'}",
                     color=0x2ECC71
                 )
-                embed.add_field(name="📝 Topic", value=bet['bet_topic'], inline=False)
-                embed.add_field(name="💰 Wager Amount", value=f"**{bet['amount']:,}** Turd Coins", inline=True)
-                embed.add_field(name="👑 Winner", value=f"**{winner_user.display_name}**", inline=True)
-                embed.add_field(name="😢 Loser", value=f"**{loser_user.display_name}**", inline=True)
-                embed.add_field(name="💵 Winner New Balance", value=f"**{winner_new_balance:,}** TC", inline=True)
-                embed.add_field(name="💸 Loser New Balance", value=f"**{loser_new_balance:,}** TC", inline=True)
-                embed.add_field(name="⏰ Resolved At", value=f"<t:{int(datetime.now().timestamp())}:F>", inline=True)
-                embed.set_footer(text=f"Bet ID: {self.bet_id}")
                 
-                await channel_manager.post_to_archive(embed)
-            
-            # Update the thread
-            winner_user = await bot.fetch_user(winner_id)
-            embed = discord.Embed(
-                title=f"✅ Bet Resolved",
-                description=f"**Winner:** {winner_user.display_name if winner_user else 'Unknown'}",
-                color=0x2ECC71
+                await interaction.response.send_message("✅ Bet resolved! You confirmed your loss.", ephemeral=True)
+            else:
+                await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+            return
+        
+        # First response - store it and ping the other user
+        # Store first response in database
+        db.update_bet(self.bet_id, 
+                     pending_confirmation=1, 
+                     first_responder_id=user_id, 
+                     first_response='lose')
+        
+        # Get the other user
+        other_user = await bot.fetch_user(other_user_id)
+        
+        # Send confirmation request to the other user in thread
+        thread = interaction.channel
+        confirm_embed = discord.Embed(
+            title="⏰ Confirmation Required",
+            description=f"**{interaction.user.display_name}** admits defeat!\n\n{other_user.mention if other_user else 'The other participant'}, please confirm this win.",
+            color=0xF39C12
+        )
+        confirm_embed.add_field(name="Action Needed", value="Click ✅ to confirm you won", inline=False)
+        
+        # Send to thread
+        await thread.send(embed=confirm_embed)
+        
+        await interaction.response.send_message(
+            f"⏰ Confirmation sent to the other participant! They must confirm your loss claim.",
+            ephemeral=True
+        )
+
+
+class SubmitProofButton(ui.Button):
+    """Button to submit proof for link proof verification"""
+    
+    def __init__(self, bet_id: str):
+        super().__init__(
+            label="📎 Submit Proof",
+            style=discord.ButtonStyle.primary,
+            custom_id=f"bet_proof_{bet_id}"
+        )
+        self.bet_id = bet_id
+    
+    async def callback(self, interaction: discord.Interaction):
+        # Get the bet manager from the bot
+        bot = interaction.client
+        db = bot.db
+        
+        # Get bet info
+        bet = db.get_bet(self.bet_id)
+        
+        if not bet:
+            await interaction.response.send_message("❌ Bet not found.", ephemeral=True)
+            return
+        
+        # Check verification type
+        if bet.get('verification_type') != 'link':
+            await interaction.response.send_message(
+                "❌ Proof submission is only available for Link Proof verification bets.",
+                ephemeral=True
             )
+            return
+        
+        # Show a modal to submit proof
+        modal = SubmitProofModal(self.bet_id)
+        await interaction.response.send_modal(modal)
+
+
+class SubmitProofModal(ui.Modal):
+    """Modal to submit proof URL"""
+    
+    def __init__(self, bet_id: str):
+        super().__init__(title="📎 Submit Proof", timeout=300)
+        self.bet_id = bet_id
+        
+        self.proof_url_input = ui.TextInput(
+            label="Proof URL",
+            placeholder="https://example.com/proof (screenshot, score, etc)",
+            style=discord.TextStyle.short,
+            required=True,
+            max_length=500
+        )
+        
+        self.proof_description_input = ui.TextInput(
+            label="Description (optional)",
+            placeholder="What does this prove?",
+            style=discord.TextStyle.paragraph,
+            required=False,
+            max_length=200
+        )
+        
+        self.add_item(self.proof_url_input)
+        self.add_item(self.proof_description_input)
+    
+    async def callback(self, interaction: discord.Interaction):
+        user_id = str(interaction.user.id)
+        proof_url = self.proof_url_input.value
+        description = self.proof_description_input.value if self.proof_description_input.value else None
+        
+        # Get bot and db
+        bot = interaction.client
+        db = bot.db
+        
+        # Submit proof to database
+        success = db.submit_proof(self.bet_id, user_id, proof_url, description)
+        
+        if success:
+            # Post proof to thread
+            thread = interaction.channel
+            proof_embed = discord.Embed(
+                title="📎 Proof Submitted",
+                description=f"**{interaction.user.display_name}** submitted proof:",
+                color=0x3498DB
+            )
+            proof_embed.add_field(name="🔗 URL", value=proof_url, inline=False)
+            if description:
+                proof_embed.add_field(name="📝 Description", value=description, inline=False)
             
-            # Disable buttons
-            for item in self.view.children:
-                item.disabled = True
+            await thread.send(embed=proof_embed)
             
-            await interaction.response.edit_message(embed=embed, view=self.view)
+            await interaction.response.send_message("✅ Proof submitted successfully!", ephemeral=True)
         else:
-            await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+            await interaction.response.send_message("❌ Failed to submit proof.", ephemeral=True)
 
 
 class DisputeButton(ui.Button):
@@ -388,13 +549,17 @@ class JoinBetButton(ui.Button):
             await interaction.response.send_message("❌ Could not join bet. It may be closed.", ephemeral=True)
 
 
-def create_bet_thread_view(bet_id: str, creator_id: str, joiner_id: str = None, show_join: bool = True) -> BetThreadView:
+def create_bet_thread_view(bet_id: str, creator_id: str, joiner_id: str = None, show_join: bool = True, verification_type: str = 'manual') -> BetThreadView:
     """Create a view with buttons for a bet thread"""
     view = BetThreadView(bet_id, creator_id, joiner_id)
     
     # Add Join button if show_join is True (bet is open)
     if show_join:
         view.add_item(JoinBetButton(bet_id))
+    
+    # Add Submit Proof button for link proof verification
+    if verification_type == 'link':
+        view.add_item(SubmitProofButton(bet_id))
     
     # Add resolution buttons
     view.add_item(IWinButton(bet_id))
