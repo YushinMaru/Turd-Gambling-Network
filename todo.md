@@ -208,53 +208,53 @@ Create new module `verification.py`:
 Comprehensive revamp of the Custom Bets button with full feature set.
 
 ### 3.1 Multi-Step Thread Flow Setup
-- [ ] Create `bet_flow.py` - New module for multi-step bet creation
-- [ ] Step 1: User clicks "Custom Bets" → Creates private thread off dashboard
-- [ ] Step 2: Bot prompts for opponent selection with user dropdown
-- [ ] Step 3: Bot prompts for bet type (1v1, 1vMany, ManyvMany)
-- [ ] Step 4: Bot prompts for bet topic and amount
-- [ ] Step 5: Bot prompts for category (Sports, Gaming, Real Life, Random)
-- [ ] Step 6: Bot prompts for payout odds (Even, Custom)
-- [ ] Step 7: Bot prompts for visibility (Open, Invite Only)
-- [ ] Step 8: Bot prompts for expiration (24h, 7d, Never)
-- [ ] Step 9: Summary confirmation → Post to #turd-bets
+- [x] Create `bet_flow.py` - New module for multi-step bet creation
+- [x] Step 1: User clicks "Custom Bets" → Creates private thread off dashboard
+- [x] Step 2: Bot prompts for opponent selection with user dropdown
+- [x] Step 3: Bot prompts for bet type (1v1, 1vMany, ManyvMany)
+- [x] Step 4: Bot prompts for bet topic and amount
+- [x] Step 5: Bot prompts for category (Sports, Gaming, Real Life, Random)
+- [x] Step 6: Bot prompts for payout odds (Even, Custom)
+- [x] Step 7: Bot prompts for visibility (Open, Invite Only)
+- [x] Step 8: Bot prompts for expiration (24h, 7d, Never)
+- [x] Step 9: Summary confirmation → Post to #turd-bets
 
 ### 3.2 User Dropdown Integration
-- [ ] Add `get_server_members()` function to fetch guild members
-- [ ] Create user select dropdown with search/filter
-- [ ] Handle 1vMany with multiple user selection
-- [ ] Syntax check bet_flow.py
+- [x] Add `get_server_members()` function to fetch guild members
+- [x] Create user select dropdown with search/filter
+- [x] Handle 1vMany with multiple user selection
+- [x] Syntax check bet_flow.py
 
 ### 3.3 Bet Type Selection
-- [ ] 1v1 (head-to-head)
-- [ ] 1vMany (creator vs multiple opponents)
-- [ ] ManyvMany (team vs team)
+- [x] 1v1 (head-to-head)
+- [x] 1vMany (creator vs multiple opponents)
+- [x] ManyvMany (team vs team)
 
 ### 3.4 Bet Category Selection
-- [ ] Sports
-- [ ] Gaming
-- [ ] Real Life
-- [ ] Random/Challenge
+- [x] Sports
+- [x] Gaming
+- [x] Real Life
+- [x] Random/Challenge
 
 ### 3.5 Payout Odds Selection
-- [ ] Even (1:1)
-- [ ] Custom odds input
+- [x] Even (1:1)
+- [x] Custom odds input
 
 ### 3.6 Visibility Options
-- [ ] Open (anyone can join)
-- [ ] Invite Only (specific users)
+- [x] Open (anyone can join)
+- [x] Invite Only (specific users)
 
 ### 3.7 Expiration Options
-- [ ] 24 hours
-- [ ] 7 days
-- [ ] Never
+- [x] 24 hours
+- [x] 7 days
+- [x] Never
 
 ### 3.8 Update Bet Threads
-- [ ] Modify bet_threads.py for new bet types
-- [ ] Add participant management for multi-user bets
+- [x] Modify bet_threads.py for new bet types
+- [x] Add participant management for multi-user bets
 - [ ] Add edit bet functionality
 - [ ] Add cancel bet functionality
-- [ ] Syntax check bet_threads.py
+- [x] Syntax check bet_threads.py
 
 > **CHECKPOINT**: Custom Bets Revamp complete!
 
