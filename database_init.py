@@ -164,7 +164,14 @@ class DatabaseInitializer:
                 'scheduled_resolve_time': "ALTER TABLE bets ADD COLUMN scheduled_resolve_time TEXT",
                 'created_at': "ALTER TABLE bets ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP",
                 'resolved_at': "ALTER TABLE bets ADD COLUMN resolved_at TEXT",
-                'winner_id': "ALTER TABLE bets ADD COLUMN winner_id TEXT"
+                'winner_id': "ALTER TABLE bets ADD COLUMN winner_id TEXT",
+                # New verification fields
+                'verification_url': "ALTER TABLE bets ADD COLUMN verification_url TEXT",
+                'verification_claim': "ALTER TABLE bets ADD COLUMN verification_claim TEXT",
+                'verification_date': "ALTER TABLE bets ADD COLUMN verification_date TEXT",
+                'pending_confirmation': "ALTER TABLE bets ADD COLUMN pending_confirmation INTEGER DEFAULT 0",
+                'first_responder_id': "ALTER TABLE bets ADD COLUMN first_responder_id TEXT",
+                'first_response': "ALTER TABLE bets ADD COLUMN first_response TEXT"
             }
             
             for col, sql in migrations.items():

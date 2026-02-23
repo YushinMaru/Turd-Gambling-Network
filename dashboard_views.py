@@ -37,10 +37,12 @@ class VerificationSelectView(View):
         super().__init__(timeout=60)
         self.dashboard_view = dashboard_view
         
-        # Add verification options as buttons
+        # Add all verification options as buttons
         self.add_item(VerificationButton("manual", "🤝 Manual", "Participants agree on winner"))
         self.add_item(VerificationButton("vote", "🗳️ Vote", "Community votes on winner"))
-        self.add_item(VerificationButton("link", "🔗 Link Proof", "Loser submits proof link"))
+        self.add_item(VerificationButton("link", "🔗 Link Proof", "Either party submits proof"))
+        self.add_item(VerificationButton("ai", "🤖 AI Verification", "Bot scrapes URL to verify"))
+        self.add_item(VerificationButton("scheduled", "⏰ Scheduled", "Bot pings at date for resolution"))
     
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return True
@@ -241,8 +243,12 @@ class CreateBetModal(ui.Modal):
         verify_label = {
             "manual": "🤝 Manual",
             "vote": "🗳️ Vote",
-            "link": "🔗 Link Proof"
+            "link": "🔗 Link Proof",
+            "ai": "🤖 AI Verification",
+            "scheduled": "⏰ Scheduled"
         }.get(verification_type, "🤝 Manual")
+        
+        self.title = f"🎲 Create Bet - {verify_label}"
         
         self.topic_input = ui.TextInput(
             label="Bet Topic",
@@ -266,9 +272,52 @@ class CreateBetModal(ui.Modal):
             max_length=500
         )
         
+        # Add fields based on verification type
+        self.verification_url_input = None
+        self.verification_claim_input = None
+        self.verification_date_input = None
+        
+        if verification_type == "ai":
+            # AI verification needs URL and expected result
+            self.verification_url_input = ui.TextInput(
+                label="URL to Verify",
+                placeholder="https://example.com (page to scrape)",
+                style=discord.TextStyle.short,
+                required=True,
+                max_length=500
+            )
+            
+            self.verification_claim_input = ui.TextInput(
+                label="Expected Result",
+                placeholder="e.g., > 100 or contains 'Winner'",
+                style=discord.TextStyle.short,
+                required=True,
+                max_length=100
+            )
+        
+        if verification_type == "scheduled":
+            # Scheduled verification needs date/time
+            self.verification_date_input = ui.TextInput(
+                label="Verify At (YYYY-MM-DD HH:MM)",
+                placeholder="2025-12-31 23:59",
+                style=discord.TextStyle.short,
+                required=True,
+                max_length=16
+            )
+        
+        # Always add base fields
         self.add_item(self.topic_input)
         self.add_item(self.amount_input)
         self.add_item(self.description_input)
+        
+        # Add verification-specific fields
+        if self.verification_url_input:
+            self.add_item(self.verification_url_input)
+        if self.verification_claim_input:
+            self.add_item(self.verification_claim_input)
+        if self.verification_date_input:
+            self.add_item(self.verification_date_input)
+        
         print(f"[DEBUG] CreateBetModal __init__ complete")
     
     async def on_submit(self, interaction: discord.Interaction):
@@ -308,7 +357,25 @@ class CreateBetModal(ui.Modal):
         # Use the selected verification from the dropdown
         verification = self.selected_verification
         
-        success, message, bet_id = self.view.bet_manager.create_bet(user_id, topic, amount, description, verification_type=verification)
+        # Get verification-specific fields
+        verification_url = None
+        verification_claim = None
+        verification_date = None
+        
+        if self.selected_verification == "ai":
+            verification_url = self.verification_url_input.value if self.verification_url_input else None
+            verification_claim = self.verification_claim_input.value if self.verification_claim_input else None
+        
+        if self.selected_verification == "scheduled":
+            verification_date = self.verification_date_input.value if self.verification_date_input else None
+        
+        success, message, bet_id = self.view.bet_manager.create_bet(
+            user_id, topic, amount, description, 
+            verification_type=verification,
+            verification_url=verification_url,
+            verification_claim=verification_claim,
+            verification_date=verification_date
+        )
         
         if success:
             # Post bet to #turd-bets channel - use the guild from interaction
@@ -336,13 +403,23 @@ class CreateBetModal(ui.Modal):
             verify_display = {
                 "manual": "🤝 Manual",
                 "vote": "🗳️ Vote",
-                "link": "🔗 Link Proof"
+                "link": "🔗 Link Proof",
+                "ai": "🤖 AI Verification",
+                "scheduled": "⏰ Scheduled"
             }.get(verification, verification.capitalize())
             
             embed.add_field(name="Topic", value=topic, inline=True)
             embed.add_field(name="Amount", value=f"{amount:,} TC", inline=True)
             embed.add_field(name="Bet ID", value=f"`{bet_id}`", inline=True)
             embed.add_field(name="Verification", value=verify_display, inline=True)
+            
+            # Add verification-specific info
+            if verification == "ai" and verification_url:
+                embed.add_field(name="🔗 URL", value=verification_url[:50] + "..." if len(verification_url) > 50 else verification_url, inline=True)
+                embed.add_field(name="📋 Claim", value=verification_claim, inline=True)
+            
+            if verification == "scheduled" and verification_date:
+                embed.add_field(name="📅 Verify At", value=verification_date, inline=True)
             
             if description:
                 embed.add_field(name="Description", value=description, inline=False)
