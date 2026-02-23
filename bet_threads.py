@@ -346,6 +346,95 @@ class SubmitProofButton(ui.Button):
         await interaction.response.send_modal(modal)
 
 
+class VoteButton(ui.Button):
+    """Button to start a vote for community decision"""
+    
+    def __init__(self, bet_id: str):
+        super().__init__(
+            label="🗳️ Start Vote",
+            style=discord.ButtonStyle.primary,
+            custom_id=f"bet_vote_{bet_id}"
+        )
+        self.bet_id = bet_id
+    
+    async def callback(self, interaction: discord.Interaction):
+        user_id = str(interaction.user.id)
+        
+        # Get bot and db
+        bot = interaction.client
+        db = bot.db
+        
+        # Get bet info
+        bet = db.get_bet(self.bet_id)
+        
+        if not bet:
+            await interaction.response.send_message("❌ Bet not found.", ephemeral=True)
+            return
+        
+        # Check if this is a vote verification type
+        if bet.get('verification_type') != 'vote':
+            await interaction.response.send_message(
+                "❌ Voting is only available for Vote verification bets.",
+                ephemeral=True
+            )
+            return
+        
+        # Get participants
+        participants = db.get_bet_participants(self.bet_id)
+        
+        if len(participants) < 2:
+            await interaction.response.send_message(
+                "❌ Need at least 2 participants to start a vote.",
+                ephemeral=True
+            )
+            return
+        
+        # Build vote embed
+        side_a_names = []
+        side_b_names = []
+        for p in participants:
+            name = p['display_name'] or p['username']
+            if p['side'] == 'A':
+                side_a_names.append(name)
+            else:
+                side_b_names.append(name)
+        
+        embed = discord.Embed(
+            title=f"🗳️ Vote: {bet['bet_topic']}",
+            description="Vote for the winner! The majority decides.",
+            color=0x9B59B6
+        )
+        embed.add_field(
+            name="Side A", 
+            value=", ".join(side_a_names) if side_a_names else "None", 
+            inline=True
+        )
+        embed.add_field(
+            name="Side B", 
+            value=", ".join(side_b_names) if side_b_names else "None", 
+            inline=True
+        )
+        embed.add_field(
+            name="How to Vote",
+            value="React with 🇦 for Side A or 🇧 for Side B",
+            inline=False
+        )
+        embed.set_footer(text=f"Bet ID: {self.bet_id} • Vote ends in 24 hours")
+        
+        # Send vote message
+        thread = interaction.channel
+        vote_msg = await thread.send(embed=embed)
+        
+        # Add reactions
+        await vote_msg.add_reaction("🇦")
+        await vote_msg.add_reaction("🇧")
+        
+        await interaction.response.send_message(
+            "✅ Vote started! Community can now vote.",
+            ephemeral=True
+        )
+
+
 class SubmitProofModal(ui.Modal):
     """Modal to submit proof URL"""
     
@@ -401,6 +490,70 @@ class SubmitProofModal(ui.Modal):
             await interaction.response.send_message("✅ Proof submitted successfully!", ephemeral=True)
         else:
             await interaction.response.send_message("❌ Failed to submit proof.", ephemeral=True)
+
+
+class ResolveVoteButton(ui.Button):
+    """Button to resolve a vote"""
+    
+    def __init__(self, bet_id: str):
+        super().__init__(
+            label="🗳️ Resolve Vote",
+            style=discord.ButtonStyle.success,
+            custom_id=f"bet_resolve_vote_{bet_id}"
+        )
+        self.bet_id = bet_id
+    
+    async def callback(self, interaction: discord.Interaction):
+        # Get bot and db
+        bot = interaction.client
+        db = bot.db
+        
+        # Get bet info
+        bet = db.get_bet(self.bet_id)
+        
+        if not bet:
+            await interaction.response.send_message("❌ Bet not found.", ephemeral=True)
+            return
+        
+        # Get votes
+        votes = db.get_bet_votes(self.bet_id)
+        
+        if not votes:
+            await interaction.response.send_message("❌ No votes cast yet!", ephemeral=True)
+            return
+        
+        # Get participants
+        participants = db.get_bet_participants(self.bet_id)
+        
+        vote_a = votes.get('A', 0)
+        vote_b = votes.get('B', 0)
+        
+        # Determine winner
+        if vote_a > vote_b:
+            winner_side = 'A'
+            winner_id = participants[0]['user_id'] if participants else None
+        elif vote_b > vote_a:
+            winner_side = 'B'
+            winner_id = participants[1]['user_id'] if len(participants) > 1 else None
+        else:
+            # Tie - creator wins
+            winner_side = 'A'
+            winner_id = participants[0]['user_id'] if participants else None
+        
+        if winner_id:
+            # Resolve the bet
+            bet_manager = bot.bet_manager
+            success, message = bet_manager.resolve_bet(self.bet_id, winner_id)
+            
+            if success:
+                await interaction.response.send_message(
+                    f"✅ Vote resolved! Side {winner_side} wins with {max(vote_a, vote_b)} votes!",
+                    ephemeral=True
+                )
+            else:
+                await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+        else:
+            await interaction.response.send_message("❌ Could not determine winner.", ephemeral=True)
 
 
 class DisputeButton(ui.Button):
@@ -560,6 +713,11 @@ def create_bet_thread_view(bet_id: str, creator_id: str, joiner_id: str = None, 
     # Add Submit Proof button for link proof verification
     if verification_type == 'link':
         view.add_item(SubmitProofButton(bet_id))
+    
+    # Add Vote button for vote verification
+    if verification_type == 'vote':
+        view.add_item(VoteButton(bet_id))
+        view.add_item(ResolveVoteButton(bet_id))
     
     # Add resolution buttons
     view.add_item(IWinButton(bet_id))
