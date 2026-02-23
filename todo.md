@@ -265,51 +265,51 @@ Comprehensive revamp of the Custom Bets button with full feature set.
 Extra features to enhance the betting experience.
 
 ### 4.1 Bet Images/Screenshots
-- [ ] "Upload Proof" button
-- [ ] Image upload handling
-- [ ] Store images locally or via CDN
-- [ ] Display in thread
+- [x] "Upload Proof" button
+- [x] Image upload handling
+- [x] Store images locally or via CDN
+- [x] Display in thread
 
 ### 4.2 Bet Editing
-- [ ] "Edit Bet" button for creator
-- [ ] Edit topic, amount, description
-- [ ] Cannot edit after participant joins
-- [ ] Log edit history
+- [x] "Edit Bet" button for creator
+- [x] Edit topic, amount, description
+- [x] Cannot edit after participant joins
+- [x] Log edit history
 
 ### 4.3 Bet Cancellation
-- [ ] "Cancel Bet" button for creator
-- [ ] Cancellation fee (10% of bet amount)
-- [ ] Refund to participants
-- [ ] Log cancellation
+- [x] "Cancel Bet" button for creator
+- [x] Cancellation fee (10% of bet amount)
+- [x] Refund to participants
+- [x] Log cancellation
 
 ### 4.4 Bet Tags
-- [ ] Predefined tags: high-stakes, friendly, tournament, practice
-- [ ] Custom tag creation
-- [ ] Filter bets by tag
-- [ ] Tag analytics
+- [x] Predefined tags: high-stakes, friendly, tournament, practice
+- [x] Custom tag creation
+- [x] Filter bets by tag
+- [x] Tag analytics
 
 ### 4.5 Bet Reminders
-- [ ] Notification 1 hour before expiration
-- [ ] Notification when bet is joined
-- [ ] Notification when vote starts
-- [ ] Notification when resolution required
+- [x] Notification 1 hour before expiration
+- [x] Notification when bet is joined
+- [x] Notification when vote starts
+- [x] Notification when resolution required
 
 ### 4.6 Bet Analytics
-- [ ] Track win rates by category
-- [ ] Track win rates by bet type
-- [ ] Most active bettors
-- [ ] Popular bet categories
-- [ ] "My Stats" enhanced display
+- [x] Track win rates by category
+- [x] Track win rates by bet type
+- [x] Most active bettors
+- [x] Popular bet categories
+- [x] "My Stats" enhanced display
 
 ### 4.7 Bet Chat
-- [ ] Allow messages in bet threads
-- [ ] Bot welcomes in thread
-- [ ] Thread stays open for discussion
+- [x] Allow messages in bet threads
+- [x] Bot welcomes in thread
+- [x] Thread stays open for discussion
 
 ### 4.8 Side Bets
-- [ ] Add prop bets to existing bet
-- [ ] Track multiple outcomes
-- [ ] Separate resolution
+- [x] Add prop bets to existing bet
+- [x] Track multiple outcomes
+- [x] Separate resolution
 
 > **CHECKPOINT**: Additional Features complete!
 

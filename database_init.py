@@ -137,6 +137,34 @@ class DatabaseInitializer:
             )
         ''')
         
+        # Create side_bets table for prop bets
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS side_bets (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                parent_bet_id TEXT NOT NULL,
+                side_bet_topic TEXT NOT NULL,
+                odds TEXT DEFAULT 'even',
+                status TEXT DEFAULT 'open',
+                winner_id TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                resolved_at TEXT,
+                FOREIGN KEY (parent_bet_id) REFERENCES bets(bet_id)
+            )
+        ''')
+        
+        # Create side_bet_participants table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS side_bet_participants (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                side_bet_id INTEGER NOT NULL,
+                user_id TEXT NOT NULL,
+                side TEXT NOT NULL,
+                joined_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (side_bet_id) REFERENCES side_bets(id),
+                FOREIGN KEY (user_id) REFERENCES users(user_id)
+            )
+        ''')
+        
         conn.commit()
         
         # Migration: Add missing columns to existing tables
