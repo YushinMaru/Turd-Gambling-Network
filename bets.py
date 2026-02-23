@@ -23,7 +23,7 @@ class BetManager:
         """Generate unique bet ID"""
         return f"BET-{uuid.uuid4().hex[:8].upper()}"
     
-    def create_bet(self, creator_id: str, bet_topic: str, amount: int, bet_description: str = None) -> tuple[bool, str, Optional[str]]:
+    def create_bet(self, creator_id: str, bet_topic: str, amount: int, bet_description: str = None, verification_type: str = 'manual') -> tuple[bool, str, Optional[str]]:
         """Create a new bet"""
         # Validate amount
         valid, message = self.currency.validate_bet_amount(amount)
@@ -39,10 +39,10 @@ class BetManager:
         bet_id = self.generate_bet_id()
         
         # Create bet
-        success = self.db.create_bet(bet_id, creator_id, bet_topic, amount, bet_description)
+        success = self.db.create_bet(bet_id, creator_id, bet_topic, amount, bet_description, verification_type=verification_type)
         
         if success:
-            logger.info(f"Bet created: {bet_id} by {creator_id} for {amount}")
+            logger.info(f"Bet created: {bet_id} by {creator_id} for {amount} (verification: {verification_type})")
             return True, f"✅ Bet created! Bet ID: `{bet_id}`", bet_id
         else:
             return False, "❌ Failed to create bet. Please try again.", None

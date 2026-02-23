@@ -160,14 +160,21 @@ class ChannelManager:
         return thread
     
     async def post_to_archive(self, embed: discord.Embed, guild_id: int = None):
-        """Post a completed bet to the archive channel"""
-        archive_channel = self.get_archive_channel(guild_id)
-        if not archive_channel:
-            logger.error("[CHANNELS] Archive channel not set up!")
+        """Post a completed bet to the archive channel in ALL guilds"""
+        # If guild_id provided, post only to that guild
+        if guild_id:
+            archive_channel = self.get_archive_channel(guild_id)
+            if archive_channel:
+                await archive_channel.send(embed=embed)
+                logger.info(f"[CHANNELS] Posted to archive in guild {guild_id}")
             return
         
-        await archive_channel.send(embed=embed)
-        logger.info("[CHANNELS] Posted to archive")
+        # Otherwise, post to ALL guilds
+        for gid, channels in self.guild_channels.items():
+            archive_channel = channels.get('archive_channel')
+            if archive_channel:
+                await archive_channel.send(embed=embed)
+                logger.info(f"[CHANNELS] Posted to archive in guild {gid}")
     
     async def post_dispute_to_admin(self, embed: discord.Embed, guild_id: int = None):
         """Post a dispute to the admin channel"""

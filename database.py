@@ -176,7 +176,7 @@ class DatabaseManager:
             conn.close()
             return False
     
-    def create_bet(self, bet_id: str, creator_id: str, bet_topic: str, amount: int, bet_description: str = None) -> bool:
+    def create_bet(self, bet_id: str, creator_id: str, bet_topic: str, amount: int, bet_description: str = None, verification_type: str = 'manual') -> bool:
         """Create a new bet"""
         conn = self.get_connection()
         c = conn.cursor()
@@ -184,7 +184,7 @@ class DatabaseManager:
         try:
             c.execute('''INSERT INTO bets (bet_id, creator_id, bet_topic, bet_description, amount, status, bet_type, category, odds, visibility, expiration, verification_type)
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                     (bet_id, creator_id, bet_topic, bet_description, amount, 'open', '1v1', 'Random', 'even', 'open', '7d', 'manual'))
+                     (bet_id, creator_id, bet_topic, bet_description, amount, 'open', '1v1', 'Random', 'even', 'open', '7d', verification_type))
             
             # Add creator as participant (side A)
             c.execute('''INSERT INTO bet_participants (bet_id, user_id, side)

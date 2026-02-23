@@ -104,11 +104,110 @@ The foundation: users create bets against each other (1v1, 1vMany, ManyvMany).
 
 ---
 
-## 🎯 PHASE 2 — Custom Bets Revamp (Multi-Step Thread Flow)
+## 🎯 PHASE 2 — Enhanced Verification System
+
+Multiple verification methods for bet resolution with dual-confirmation flow.
+
+### 2.1 Verification Dropdown Options
+Add the following options to the verification method dropdown in the bet creation modal:
+- [x] 🤝 **Manual** - Both parties must agree on winner
+- [ ] 🗳️ **Vote** - Community votes to decide winner
+- [ ] 🔗 **Link Proof** - Either party submits proof, admin resolves
+- [ ] 🤖 **AI Verification** - Bot scrapes URL and verifies result
+- [ ] ⏰ **Scheduled** - Bot pings at specified date for resolution
+
+### 2.2 Bet Creation Modal Updates
+- [ ] Add date/time field to bet creation modal for scheduled verification
+- [ ] Add URL field for AI verification (what to scrape)
+- [ ] Add expected result field for AI verification (what to check)
+- [ ] Update verification dropdown in dashboard_views.py
+- [ ] Syntax check dashboard_views.py
+
+### 2.3 Database Schema Updates
+Add new columns to the bets table:
+- [ ] `verification_url` - URL for AI verification to scrape
+- [ ] `verification_claim` - Expected result/claim to verify
+- [ ] `verification_date` - Date/time for scheduled verification
+- [ ] `pending_confirmation` - Boolean, true when waiting for second user
+- [ ] `first_responder_id` - User ID who first clicked win/lose
+- [ ] `first_response` - Which side they chose (A or B)
+- [ ] Update database.py with new fields
+- [ ] Syntax check database.py
+
+### 2.4 Dual-Confirmation Resolution Flow (Manual & Link Proof)
+**IMPORTANT**: Bet must NOT resolve until BOTH parties agree or dispute is filed.
+
+Implementation in bet_threads.py:
+- [ ] Modify IWinButton callback to NOT immediately resolve
+- [ ] Store first responder's choice in database (pending_confirmation=true)
+- [ ] Send ping to second user: "User X claims they won. Please confirm or dispute."
+- [ ] Add ConfirmButton - second user agrees, bet resolves
+- [ ] Add DisputeButton - second user disputes, goes to admin
+- [ ] Update ILoseButton to work the same way
+- [ ] Bet stays in "pending_confirmation" until both agree or dispute
+- [ ] If first user changes mind before second responds, allow them to cancel their claim
+- [ ] Syntax check bet_threads.py
+
+### 2.5 Submit Proof Button (Link Proof Verification)
+Add to bet thread for both users:
+- [ ] Create SubmitProofButton with custom_id pattern: `proof_{bet_id}_{user_id}`
+- [ ] Button label: "📎 Submit Proof"
+- [ ] Opens modal with TextInput for proof URL
+- [ ] Stores proof_url in database
+- [ ] Posts proof to bet thread
+- [ ] Both users can submit proof before resolution
+- [ ] Syntax check bet_threads.py
+
+### 2.6 Scheduled Verification System
+- [ ] Create background task in main.py to check scheduled bets
+- [ ] Run every 5 minutes to check for bets at verification time
+- [ ] At verification time, ping both users in thread: "Time to resolve! Click I Win/I Lose"
+- [ ] For Vote: Automatically start vote poll at verification time
+- [ ] For AI: Run verification check at this time
+- [ ] Syntax check main.py
+
+### 2.7 Vote Verification System
+- [ ] Create VoteStartButton in bet_threads.py
+- [ ] Creates poll embed with reactions for each side
+- [ ] Allows all server members to vote
+- [ ] 24 hour vote timeout
+- [ ] Majority wins, tie goes to creator
+- [ ] Auto-resolves or flags for admin if unclear
+- [ ] Syntax check bet_threads.py
+
+### 2.8 AI Verification System (URL Scraping)
+Create new module `verification.py`:
+- [ ] Create `scrape_url(url)` function using requests + beautifulsoup4
+- [ ] Create `verify_claim(content, claim)` function
+- [ ] Support numeric comparisons: >, <, >=, <=, ==, !=
+- [ ] Support text contains: "contains X"
+- [ ] Create verification result: WIN_A, WIN_B, UNCLEAR
+- [ ] If UNCLEAR, flag for admin review
+- [ ] Cache scraped data to avoid rate limits
+- [ ] Syntax check verification.py
+
+### 2.9 Admin Resolution Workflow
+- [ ] When dispute filed, post to #turd-admin
+- [ ] Include all proof submitted
+- [ ] Include both users' claims
+- [ ] Admin can resolve with winner selection
+- [ ] Admin can cancel and refund
+- [ ] Syntax check dashboard_views.py
+
+### 2.10 Archive Updates
+- [ ] Archive posts to ALL guilds the bot is in (already implemented)
+- [ ] Include verification method in archive embed
+- [ ] Include proof links if submitted
+
+> **CHECKPOINT**: Enhanced Verification System complete!
+
+---
+
+## 🎯 PHASE 3 — Custom Bets Revamp (Multi-Step Thread Flow)
 
 Comprehensive revamp of the Custom Bets button with full feature set.
 
-### 2.1 Multi-Step Thread Flow Setup
+### 3.1 Multi-Step Thread Flow Setup
 - [ ] Create `bet_flow.py` - New module for multi-step bet creation
 - [ ] Step 1: User clicks "Custom Bets" → Creates private thread off dashboard
 - [ ] Step 2: Bot prompts for opponent selection with user dropdown
@@ -120,52 +219,37 @@ Comprehensive revamp of the Custom Bets button with full feature set.
 - [ ] Step 8: Bot prompts for expiration (24h, 7d, Never)
 - [ ] Step 9: Summary confirmation → Post to #turd-bets
 
-### 2.2 User Dropdown Integration
+### 3.2 User Dropdown Integration
 - [ ] Add `get_server_members()` function to fetch guild members
 - [ ] Create user select dropdown with search/filter
 - [ ] Handle 1vMany with multiple user selection
 - [ ] Syntax check bet_flow.py
 
-### 2.3 Database Schema Updates
-- [ ] Add new columns to bets table: bet_type, category, odds, visibility, expiration, proof_url
-- [ ] Add bet_participants table for multi-user bets
-- [ ] Add bet_tags table for categorization
-- [ ] Add verification_type column
-- [ ] Add scheduled_resolve_time column
-- [ ] Update database.py with new CRUD operations
-- [ ] Syntax check database files
-
-### 2.4 Bet Type Selection
+### 3.3 Bet Type Selection
 - [ ] 1v1 (head-to-head)
 - [ ] 1vMany (creator vs multiple opponents)
 - [ ] ManyvMany (team vs team)
 
-### 2.5 Bet Category Selection
+### 3.4 Bet Category Selection
 - [ ] Sports
 - [ ] Gaming
 - [ ] Real Life
 - [ ] Random/Challenge
 
-### 2.6 Payout Odds Selection
+### 3.5 Payout Odds Selection
 - [ ] Even (1:1)
 - [ ] Custom odds input
 
-### 2.7 Visibility Options
+### 3.6 Visibility Options
 - [ ] Open (anyone can join)
 - [ ] Invite Only (specific users)
 
-### 2.8 Expiration Options
+### 3.7 Expiration Options
 - [ ] 24 hours
 - [ ] 7 days
 - [ ] Never
 
-### 2.9 Update Dashboard Views
-- [ ] Modify CustomBetsButton in dashboard_views.py to use new flow
-- [ ] Add user dropdown handling
-- [ ] Add modal for final confirmation
-- [ ] Syntax check dashboard_views.py
-
-### 2.10 Update Bet Threads
+### 3.8 Update Bet Threads
 - [ ] Modify bet_threads.py for new bet types
 - [ ] Add participant management for multi-user bets
 - [ ] Add edit bet functionality
@@ -173,51 +257,6 @@ Comprehensive revamp of the Custom Bets button with full feature set.
 - [ ] Syntax check bet_threads.py
 
 > **CHECKPOINT**: Custom Bets Revamp complete!
-
----
-
-## 🎯 PHASE 3 — Bet Verification System
-
-Multiple verification methods for bet resolution.
-
-### 3.1 Manual Verification
-- [ ] Admin approval workflow
-- [ ] "Request Verification" button
-- [ ] Admin panel to approve/reject winners
-- [ ] Notification to participants
-
-### 3.2 Link Proof Submission
-- [ ] "Submit Proof" button in bet thread
-- [ ] Modal for URL input
-- [ ] Store proof URL in database
-- [ ] Display proof in thread
-
-### 3.3 Scheduled Auto-Resolve
-- [ ] Date/time picker for resolution
-- [ ] Background task to check scheduled bets
-- [ ] Auto-resolve when time reached
-- [ ] Notify participants
-
-### 3.4 Poll Vote System
-- [ ] "Start Vote" button
-- [ ] Create poll embed with vote buttons
-- [ ] Collect votes from server members
-- [ ] Determine winner by majority
-- [ ] Timeout for poll (24h default)
-
-### 3.5 API Integration - Sports
-- [ ] Integrate OpenDB/TheSportsDB API
-- [ ] Create `sports_api.py` module
-- [ ] Auto-resolve sports bets
-- [ ] Cache API responses
-
-### 3.6 API Integration - Crypto
-- [ ] Integrate CoinGecko API
-- [ ] Create `crypto_api.py` module
-- [ ] Create crypto price prediction bets
-- [ ] Auto-resolve at specified time
-
-> **CHECKPOINT**: Verification System complete!
 
 ---
 
@@ -302,16 +341,14 @@ turd-gambling-network/
 ├── database.py                # DB operations
 ├── currency.py                # Turd Coins
 ├── bets.py                    # Bet logic
-├── bet_flow.py                # Multi-step bet creation (NEW)
+├── bet_flow.py                # Multi-step bet creation
 ├── bet_threads.py             # Thread views
-├── verification.py            # Verification system (NEW)
-├── sports_api.py              # Sports API integration (NEW)
-├── crypto_api.py              # Crypto API integration (NEW)
+├── verification.py            # AI verification system (NEW)
 ├── quips.py                   # Character quotes
 ├── dashboard.py               # Dashboard embed
 ├── dashboard_views.py         # Button handlers
 ├── requirements.txt           # Dependencies
-├── .env                       # Private config
+├── .env                      # Private config
 ├── .env.example              # Config template
 ├── run_bot.bat               # Launch script
 ├── tests/                    # Test files

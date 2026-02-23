@@ -30,8 +30,51 @@ class DashboardView(ui.View):
         self.add_item(DailyBonusButton())
 
 
+class VerificationSelectView(View):
+    """View to select verification method before creating a bet"""
+    
+    def __init__(self, dashboard_view):
+        super().__init__(timeout=60)
+        self.dashboard_view = dashboard_view
+        
+        # Add verification options as buttons
+        self.add_item(VerificationButton("manual", "🤝 Manual", "Participants agree on winner"))
+        self.add_item(VerificationButton("vote", "🗳️ Vote", "Community votes on winner"))
+        self.add_item(VerificationButton("link", "🔗 Link Proof", "Loser submits proof link"))
+    
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return True
+
+
+class VerificationButton(ui.Button):
+    """Button to select verification method"""
+    
+    def __init__(self, value: str, label: str, description: str):
+        super().__init__(
+            label=label,
+            style=discord.ButtonStyle.secondary,
+            custom_id=f"verify_{value}"
+        )
+        self.value = value
+        self.description = description
+    
+    async def callback(self, interaction: discord.Interaction):
+        print(f"[DEBUG] VerificationButton callback triggered for value: {self.value}")
+        try:
+            # Show the modal with the selected verification
+            modal = CreateBetModal(self.view.dashboard_view, self.value)
+            await interaction.response.send_modal(modal)
+            print(f"[DEBUG] Modal sent successfully")
+        except Exception as e:
+            print(f"[DEBUG] VerificationButton ERROR: {e}")
+            try:
+                await interaction.followup.send("Error opening bet modal. Please try again.", ephemeral=True)
+            except:
+                pass
+
+
 class CustomBetsButton(ui.Button):
-    """Button to create custom bets - shows modal"""
+    """Button to create custom bets - shows verification selection first"""
     
     def __init__(self):
         super().__init__(
@@ -43,17 +86,27 @@ class CustomBetsButton(ui.Button):
     async def callback(self, interaction: discord.Interaction):
         print(f"[DEBUG] CustomBetsButton callback triggered for user {interaction.user.id}")
         
-        # Ensure user exists
-        user_id = str(interaction.user.id)
-        username = interaction.user.name
-        display_name = interaction.user.display_name
-        
-        self.view.db.ensure_user_exists(user_id, username, display_name)
-        
-        # Show the modal directly
-        modal = CreateBetModal(self.view)
-        await interaction.response.send_modal(modal)
-        print(f"[DEBUG] Modal sent to user {interaction.user.id}")
+        try:
+            # Ensure user exists
+            user_id = str(interaction.user.id)
+            username = interaction.user.name
+            display_name = interaction.user.display_name
+            
+            self.view.db.ensure_user_exists(user_id, username, display_name)
+            
+            # Show verification selection view first
+            view = VerificationSelectView(self.view)
+            embed = discord.Embed(
+                title="🎲 Create a Bet",
+                description="Select a verification method:",
+                color=0x9B59B6
+            )
+            await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+            print(f"[DEBUG] Verification selection sent to user {interaction.user.id}")
+        except Exception as e:
+            print(f"[DEBUG] CustomBetsButton ERROR: {e}")
+            import traceback
+            traceback.print_exc()
 
 
 class JoinBetButton(ui.Button):
@@ -178,10 +231,18 @@ import traceback
 class CreateBetModal(ui.Modal):
     """Modal to create a new bet"""
     
-    def __init__(self, view):
-        print(f"[DEBUG] CreateBetModal __init__ called")
+    def __init__(self, view, verification_type: str = "manual"):
+        print(f"[DEBUG] CreateBetModal __init__ called with verification: {verification_type}")
         super().__init__(title="🎲 Create a Bet", timeout=300)
         self.view = view
+        self.selected_verification = verification_type
+        
+        # Set title based on verification type
+        verify_label = {
+            "manual": "🤝 Manual",
+            "vote": "🗳️ Vote",
+            "link": "🔗 Link Proof"
+        }.get(verification_type, "🤝 Manual")
         
         self.topic_input = ui.TextInput(
             label="Bet Topic",
@@ -244,7 +305,10 @@ class CreateBetModal(ui.Modal):
         topic = self.topic_input.value
         description = self.description_input.value if self.description_input.value else None
         
-        success, message, bet_id = self.view.bet_manager.create_bet(user_id, topic, amount, description)
+        # Use the selected verification from the dropdown
+        verification = self.selected_verification
+        
+        success, message, bet_id = self.view.bet_manager.create_bet(user_id, topic, amount, description, verification_type=verification)
         
         if success:
             # Post bet to #turd-bets channel - use the guild from interaction
@@ -268,9 +332,17 @@ class CreateBetModal(ui.Modal):
                 color=0x2ECC71
             )
             
+            # Get verification display
+            verify_display = {
+                "manual": "🤝 Manual",
+                "vote": "🗳️ Vote",
+                "link": "🔗 Link Proof"
+            }.get(verification, verification.capitalize())
+            
             embed.add_field(name="Topic", value=topic, inline=True)
             embed.add_field(name="Amount", value=f"{amount:,} TC", inline=True)
             embed.add_field(name="Bet ID", value=f"`{bet_id}`", inline=True)
+            embed.add_field(name="Verification", value=verify_display, inline=True)
             
             if description:
                 embed.add_field(name="Description", value=description, inline=False)
