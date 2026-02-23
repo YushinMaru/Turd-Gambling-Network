@@ -93,17 +93,29 @@ class IWinButton(ui.Button):
                 break
         
         # Check if there's already a pending confirmation (first response)
-        if bet.get('pending_confirmation') == 1 and bet.get('first_responder_id') == other_user_id:
-            # The other user already claimed - this user is confirming
-            # Resolve bet with this user as winner
-            success, message = bet_manager.resolve_bet(self.bet_id, user_id)
-            
-            if success:
-                await self._resolve_and_post(bot, db, self.bet_id, user_id, channel_manager)
-                await interaction.response.send_message(f"✅ Bet resolved! You confirmed and won!", ephemeral=True)
+        existing_responder = bet.get('first_responder_id')
+        existing_response = bet.get('first_response')
+        
+        if existing_responder == other_user_id:
+            # The other user already claimed something
+            # Check if their claim matches our outcome (they said lose, we say win = match!)
+            if existing_response == 'lose':
+                # They admitted defeat, we claim we won - RESOLVE!
+                success, message = bet_manager.resolve_bet(self.bet_id, user_id)
+                
+                if success:
+                    await self._resolve_and_post(bot, db, self.bet_id, user_id, channel_manager)
+                    await interaction.response.send_message(f"✅ Bet resolved! Other user confirmed they lost!", ephemeral=True)
+                else:
+                    await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+                return
             else:
-                await interaction.response.send_message(f"❌ {message}", ephemeral=True)
-            return
+                # They also claimed they won - need dispute
+                await interaction.response.send_message(
+                    "⚠️ The other user also claims they won! Please use the Dispute button.",
+                    ephemeral=True
+                )
+                return
         
         # First response - store it and ping the other user
         if other_user_id:
@@ -236,51 +248,56 @@ class ILoseButton(ui.Button):
             return
         
         # Check if there's already a pending confirmation
-        if bet.get('pending_confirmation') == 1 and bet.get('first_responder_id') == other_user_id:
-            # The other user already claimed - this user is confirming they lost
-            # Resolve bet with the other user as winner
-            success, message = bet_manager.resolve_bet(self.bet_id, other_user_id)
-            
-            if success:
-                # Get full bet details
-                winner_user = await bot.fetch_user(other_user_id)
-                loser_user = interaction.user
+        existing_responder = bet.get('first_responder_id')
+        existing_response = bet.get('first_response')
+        
+        if existing_responder == other_user_id:
+            # The other user already claimed something
+            # Check if their claim matches our outcome (they said win, we say lose = match!)
+            if existing_response == 'win':
+                # They claimed they won, we admit we lost - RESOLVE!
+                success, message = bet_manager.resolve_bet(self.bet_id, other_user_id)
                 
-                bet = db.get_bet(self.bet_id)
-                
-                # Get balances
-                winner_new_balance = db.get_balance(other_user_id)
-                loser_new_balance = db.get_balance(user_id)
-                
-                # Post detailed embed to archive
-                if channel_manager:
-                    embed = discord.Embed(
-                        title=f"🏆 Bet Resolved - {self.bet_id}",
-                        description=f"✅ **Bet Complete!**",
-                        color=0x2ECC71
-                    )
-                    embed.add_field(name="📝 Topic", value=bet['bet_topic'], inline=False)
-                    embed.add_field(name="💰 Wager Amount", value=f"**{bet['amount']:,}** Turd Coins", inline=True)
-                    embed.add_field(name="👑 Winner", value=f"**{winner_user.display_name}**", inline=True)
-                    embed.add_field(name="😢 Loser", value=f"**{loser_user.display_name}**", inline=True)
-                    embed.add_field(name="💵 Winner New Balance", value=f"**{winner_new_balance:,}** TC", inline=True)
-                    embed.add_field(name="💸 Loser New Balance", value=f"**{loser_new_balance:,}** TC", inline=True)
-                    embed.add_field(name="⏰ Resolved At", value=f"<t:{int(datetime.now().timestamp())}:F>", inline=True)
-                    embed.set_footer(text=f"Bet ID: {self.bet_id}")
+                if success:
+                    # Get full bet details
+                    winner_user = await bot.fetch_user(other_user_id)
+                    loser_user = interaction.user
                     
-                    await channel_manager.post_to_archive(embed)
-                
-                # Update the thread
-                embed = discord.Embed(
-                    title=f"✅ Bet Resolved",
-                    description=f"**Winner:** {winner_user.display_name if winner_user else 'Unknown'}",
-                    color=0x2ECC71
-                )
-                
-                await interaction.response.send_message("✅ Bet resolved! You confirmed your loss.", ephemeral=True)
+                    bet = db.get_bet(self.bet_id)
+                    
+                    # Get balances
+                    winner_new_balance = db.get_balance(other_user_id)
+                    loser_new_balance = db.get_balance(user_id)
+                    
+                    # Post detailed embed to archive
+                    if channel_manager:
+                        embed = discord.Embed(
+                            title=f"🏆 Bet Resolved - {self.bet_id}",
+                            description=f"✅ **Bet Complete!**",
+                            color=0x2ECC71
+                        )
+                        embed.add_field(name="📝 Topic", value=bet['bet_topic'], inline=False)
+                        embed.add_field(name="💰 Wager Amount", value=f"**{bet['amount']:,}** Turd Coins", inline=True)
+                        embed.add_field(name="👑 Winner", value=f"**{winner_user.display_name}**", inline=True)
+                        embed.add_field(name="😢 Loser", value=f"**{loser_user.display_name}**", inline=True)
+                        embed.add_field(name="💵 Winner New Balance", value=f"**{winner_new_balance:,}** TC", inline=True)
+                        embed.add_field(name="💸 Loser New Balance", value=f"**{loser_new_balance:,}** TC", inline=True)
+                        embed.add_field(name="⏰ Resolved At", value=f"<t:{int(datetime.now().timestamp())}:F>", inline=True)
+                        embed.set_footer(text=f"Bet ID: {self.bet_id}")
+                        
+                        await channel_manager.post_to_archive(embed)
+                    
+                    await interaction.response.send_message("✅ Bet resolved! You confirmed your loss.", ephemeral=True)
+                else:
+                    await interaction.response.send_message(f"❌ {message}", ephemeral=True)
+                return
             else:
-                await interaction.response.send_message(f"❌ {message}", ephemeral=True)
-            return
+                # They also said they lost - need dispute
+                await interaction.response.send_message(
+                    "⚠️ The other user also admits defeat! Please use the Dispute button.",
+                    ephemeral=True
+                )
+                return
         
         # First response - store it and ping the other user
         # Store first response in database
